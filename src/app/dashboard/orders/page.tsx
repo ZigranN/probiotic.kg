@@ -144,21 +144,6 @@ export default async function OrdersPage() {
                                         ))}
                                     </div>
 
-                                    {/* Адрес доставки */}
-                                    {order.city && (
-                                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm">
-                                            <p className="font-bold text-[#29380E] mb-1">Адрес доставки:</p>
-                                            <p className="text-[#A8A496]">
-                                                {order.city}, {order.street}, {order.building}
-                                                {order.apartment && `, кв. ${order.apartment}`}
-                                            </p>
-                                            {order.deliveryNotes && (
-                                                <p className="text-[#A8A496] mt-2 italic">
-                                                    Примечание: {order.deliveryNotes}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
 
                                     {/* Кнопки действий */}
                                     <div className="flex flex-wrap gap-3 mt-6">

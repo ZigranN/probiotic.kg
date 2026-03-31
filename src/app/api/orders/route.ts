@@ -20,14 +20,8 @@ export async function POST(req: NextRequest) {
             data: {
                 customerName: name,
                 customerPhone: phone,
-                customerEmail: email || null,
                 totalPrice: parseFloat(totalPrice.toString()),
                 userId: userId || null,
-                city: address?.city || null,
-                street: address?.street || null,
-                building: address?.building || null,
-                apartment: address?.apartment || null,
-                deliveryNotes: address?.notes || null,
                 status: 'PENDING',
                 items: {
                     create: cart.map((item: any) => ({
@@ -45,17 +39,22 @@ export async function POST(req: NextRequest) {
 
         // Отправка email-подтверждения (если указан email)
         if (email) {
-            await sendOrderConfirmation({
-                id: order.id,
-                customerName: name,
-                customerEmail: email,
-                totalPrice: order.totalPrice,
-                items: order.items.map(item => ({
-                    name: item.name,
-                    quantity: item.quantity,
-                    price: item.price,
-                })),
-            });
+            try {
+                await sendOrderConfirmation({
+                    id: order.id,
+                    customerName: name,
+                    customerEmail: email,
+                    totalPrice: order.totalPrice,
+                    items: order.items.map(item => ({
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                    })),
+                });
+            } catch (emailError) {
+                console.error('Email sending failed:', emailError);
+                // Не блокируем создание заказа если email не отправился
+            }
         }
 
         return NextResponse.json({

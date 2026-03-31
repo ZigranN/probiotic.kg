@@ -22,9 +22,6 @@ export default async function DashboardPage() {
                     items: true,
                 },
             },
-            addresses: {
-                orderBy: { isDefault: "desc" },
-            },
         },
     });
 
@@ -130,7 +127,7 @@ export default async function DashboardPage() {
                                             Адресов
                                         </p>
                                         <p className="text-3xl font-black text-[#29380E]">
-                                            {user.addresses.length}
+                                            {0}
                                         </p>
                                     </div>
                                 </div>

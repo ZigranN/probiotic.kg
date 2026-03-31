@@ -12,7 +12,34 @@ import {
     CheckCircle2,
     ArrowRight,
 } from "lucide-react";
-import { marketingPlan, siteConfig } from "@/lib/content";
+import { siteConfig } from "@/lib/content";
+
+// Временные данные маркетинг плана (TODO: перенести в content.ts)
+const marketingPlan = {
+    packages: [
+        {
+            id: 'starter',
+            name: 'Стартовый',
+            priceKgs: 5600,
+            pv: 100,
+            benefits: ['1 продукт на выбор', 'Доступ к обучению', 'Личный кабинет'],
+        },
+        {
+            id: 'business',
+            name: 'Бизнес',
+            priceKgs: 16800,
+            pv: 300,
+            benefits: ['3 продукта', 'Маркетинг материалы', 'Менторская поддержка'],
+        },
+        {
+            id: 'premium',
+            name: 'Премиум',
+            priceKgs: 56000,
+            pv: 1000,
+            benefits: ['10 продуктов', 'VIP поддержка', 'Максимальные бонусы'],
+        },
+    ],
+};
 
 export default function BusinessPage() {
     // Оставляем только 3 основных пакета для солидности
@@ -65,26 +92,20 @@ export default function BusinessPage() {
                             <h3 className="text-3xl font-black text-[#29380E] mb-4 uppercase italic tracking-tighter">{pkg.name}</h3>
 
                             <div className="flex items-baseline gap-1 mb-2">
-                                <span className="text-5xl font-black text-[#21AA57]">${pkg.priceUsd}</span>
+                                <span className="text-5xl font-black text-[#21AA57]">${pkg.priceKgs}</span>
                             </div>
 
                             <div className="text-[#A8A496] font-bold text-sm uppercase tracking-widest mb-8 pb-4 border-b border-gray-100">
-                                {pkg.pv} PV — {pkg.status}
+                                {pkg.pv} PV
                             </div>
 
                             <ul className="space-y-5 mb-10 flex-grow">
-                                <li className="flex items-start gap-3 text-base text-[#29380E]/80">
-                                    <CheckCircle2 className="w-6 h-6 text-[#21AA57] flex-shrink-0" />
-                                    <span>Активация кабинета: <strong>{pkg.activationMonths} мес.</strong></span>
-                                </li>
-                                <li className="flex items-start gap-3 text-base text-[#29380E]/80">
-                                    <CheckCircle2 className="w-6 h-6 text-[#21AA57] flex-shrink-0" />
-                                    <span>Доступ к Digital-обучению</span>
-                                </li>
-                                <li className="flex items-start gap-3 text-base text-[#29380E]/80">
-                                    <CheckCircle2 className="w-6 h-6 text-[#21AA57] flex-shrink-0" />
-                                    <span>Бинарный бонус до {pkg.id === 'vip' ? '14%' : pkg.id === 'big' ? '12%' : '10%'}</span>
-                                </li>
+                                {pkg.benefits.map((benefit, idx) => (
+                                    <li key={idx} className="flex items-start gap-3 text-base text-[#29380E]/80">
+                                        <CheckCircle2 className="w-6 h-6 text-[#21AA57] flex-shrink-0" />
+                                        <span>{benefit}</span>
+                                    </li>
+                                ))}
                             </ul>
 
                             <a
@@ -158,20 +179,33 @@ export default function BusinessPage() {
                             Почему выбирают <br/><span className="text-[#21AA57]">наш маркетинг?</span>
                         </h2>
                         <div className="grid grid-cols-1 gap-4">
-                            {marketingPlan.bonuses.map((bonus, i) => (
-                                <div key={i} className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
-                                    <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
-                                        {i === 0 && <Users className="w-7 h-7" />}
-                                        {i === 1 && <TrendingUp className="w-7 h-7" />}
-                                        {i === 2 && <Wallet className="w-7 h-7" />}
-                                        {i >= 3 && <Award className="w-7 h-7" />}
-                                    </div>
-                                    <div>
-                                        <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">{bonus.name}</h4>
-                                        <p className="text-[#A8A496] text-sm leading-relaxed">{bonus.desc}</p>
-                                    </div>
+                            <div className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
+                                <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
+                                    <Users className="w-7 h-7" />
                                 </div>
-                            ))}
+                                <div>
+                                    <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">Бинарная система</h4>
+                                    <p className="text-[#A8A496] text-sm leading-relaxed">Зарабатывайте с двух структур одновременно</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
+                                <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
+                                    <TrendingUp className="w-7 h-7" />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">Быстрый старт</h4>
+                                    <p className="text-[#A8A496] text-sm leading-relaxed">Начните зарабатывать уже с первой недели</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
+                                <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
+                                    <Wallet className="w-7 h-7" />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">До 14% бонуса</h4>
+                                    <p className="text-[#A8A496] text-sm leading-relaxed">Максимальный процент в индустрии</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -191,7 +225,7 @@ export default function BusinessPage() {
                             </button>
                         </div>
                         <div className="mt-8 text-center opacity-30 text-xs uppercase tracking-widest">
-                            Курс компании: {marketingPlan.exchangeRate}
+                            Выгодные условия для партнёров
                         </div>
                     </div>
                 </div>

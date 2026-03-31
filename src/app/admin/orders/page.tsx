@@ -147,9 +147,9 @@ export default async function AdminOrdersPage() {
                                                     <div className="text-sm text-gray-500">
                                                         {order.customerPhone}
                                                     </div>
-                                                    {order.customerEmail && (
+                                                    {order.user?.email && (
                                                         <div className="text-xs text-gray-400">
-                                                            {order.customerEmail}
+                                                            {order.user.email}
                                                         </div>
                                                     )}
                                                 </div>

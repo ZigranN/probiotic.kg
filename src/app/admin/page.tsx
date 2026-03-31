@@ -16,14 +16,12 @@ export default async function AdminDashboardPage() {
         totalOrders,
         totalProducts,
         totalUsers,
-        totalReviews,
         recentOrders,
         pendingOrders,
     ] = await Promise.all([
         prisma.order.count(),
         prisma.product.count(),
         prisma.user.count(),
-        prisma.review.count(),
         prisma.order.findMany({
             take: 5,
             orderBy: { createdAt: "desc" },
@@ -64,12 +62,12 @@ export default async function AdminDashboardPage() {
             href: "/dashboard",
         },
         {
-            title: "Отзывы",
-            value: totalReviews,
-            change: "Всего отзывов",
-            icon: Star,
+            title: "Ожидают",
+            value: pendingOrders,
+            change: "Новых заказов",
+            icon: Package,
             color: "bg-yellow-500",
-            href: "/admin/products",
+            href: "/admin/orders",
         },
     ];
 

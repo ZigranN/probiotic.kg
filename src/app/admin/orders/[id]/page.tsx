@@ -9,12 +9,14 @@ interface Order {
     id: string;
     customerName: string;
     customerPhone: string;
-    customerEmail?: string;
     status: string;
     totalPrice: number;
     createdAt: string;
     city?: string;
     street?: string;
+    user?: {
+        email: string | null;
+    } | null;
     building?: string;
     apartment?: string;
     items: Array<{
@@ -195,14 +197,14 @@ export default function AdminOrderDetailPage({
                                         {order.customerPhone}
                                     </a>
                                 </div>
-                                {order.customerEmail && (
+                                {order.user?.email && (
                                     <div className="flex items-center gap-3">
                                         <Mail className="w-5 h-5 text-[#21AA57]" />
                                         <a
-                                            href={`mailto:${order.customerEmail}`}
+                                            href={`mailto:${order.user.email}`}
                                             className="text-gray-600 hover:text-[#21AA57] transition"
                                         >
-                                            {order.customerEmail}
+                                            {order.user.email}
                                         </a>
                                     </div>
                                 )}

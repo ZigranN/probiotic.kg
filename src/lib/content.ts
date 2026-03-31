@@ -669,14 +669,14 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#29380E]/20 via-[#5F7A1F]/10 to-transparent",
         availability: "in_stock",
-        oldPriceKgs: 5600,
-        priceKgs: 5500,
+        oldPriceKgs: 11200,
+        priceKgs: 10625,
         variants: [
             { id: "arginine-1", title: "1 флакон", priceKgs: 3000, pv: 25 },
             {
                 id: "arginine-2",
-                title: "2 флакона",
-                priceKgs: 5500,
+                title: "4 флакона",
+                priceKgs: 10625,
                 badge: "Выгоднее",
                 pv: 50,
             },

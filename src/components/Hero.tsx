@@ -7,11 +7,15 @@ import Image from "next/image";
 import { landing } from "@/lib/content";
 
 const promoSlides = [
-    { id: 1, name: "Максилин для семьи", image: "/images/img_4408.png" },
-    { id: 2, name: "Энергия L-Аргинина", image: "/images/img_4409.png" },
-    { id: 3, name: "Деликатная поддержка", image: "/images/img_4410.png" },
-    { id: 4, name: "Клеточное питание", image: "/images/img_4411.png" },
-    { id: 4, name: "Женское здоровье ", image: "/images/svechiKartochka.jpeg" },
+    { id: 1, name: "Максилин для семьи", image: "/images/IMG_4412.PNG" },
+    { id: 1, name: "Максилин удобный", image: "/images/IMG_4414.PNG" },
+    { id: 2, name: "Энергия L-Аргинина", image: "/images/IMG_4409.PNG" },
+    { id: 2, name: "Энергия L-Аргинина", image: "/images/IMG_4412.PNG" },
+    { id: 2, name: "Энергия L-Аргинина", image: "/images/IMG_4411.PNG" },
+    { id: 3, name: "Деликатная поддержка", image: "/images/IMG_4410.PNG" },
+    { id: 4, name: "Клеточное питание", image: "/images/IMG_4421.PNG" },
+    { id: 4, name: "Женское здоровье ", image: "/images/IMG_4413.PNG" },
+    { id: 4, name: "Женское здоровье ", image: "/images/IMG_4413.PNG" },
 ];
 
 export default function Hero() {

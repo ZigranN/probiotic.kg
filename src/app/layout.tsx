@@ -8,6 +8,8 @@ import { CookieConsent } from "@/components/CookieConsent";
 import AiChatWidget from "@/components/AiChatWidget";
 import "@/lib/env"; // Валидация env переменных при старте
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
     title: "EnergyMax | Живой пробиотик Максилин",

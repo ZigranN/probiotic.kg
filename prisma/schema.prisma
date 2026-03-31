@@ -7,219 +7,104 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-// --- ПОЛЬЗОВАТЕЛИ И РОЛИ ---
+
+model User {
+  id           String   @id @default(uuid())
+  firstName    String?
+  lastName     String?
+  phone        String?  @unique
+  email        String?  @unique
+  passwordHash String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+}
+
+model Product {
+  id            String      @id @default(uuid())
+  slug          String      @unique
+  name          String
+  category      Category
+  heroTag       String?
+  form          String?
+  packInfo      String?
+  description   String
+  oldPriceKgs   Int?
+  priceKgs      Int
+  inStock       Boolean     @default(true)
+  shortBenefits Json
+  forWhom       Json?
+  keyNotes      Json?
+  howToUse      Json?
+  cautions      Json?
+  storage       Json?
+  images        Json
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderItems    OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String?
+  createdAt     DateTime    @default(now())
+  customerName  String
+  customerPhone String
+  totalPrice    Float
+  status        String      @default("NEW")
+  user          User?       @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  quantity    Int
+  name        String
+  price       Float
+  productSlug String
+  order       Order   @relation(fields: [orderId], references: [id])
+  product     Product @relation(fields: [productSlug], references: [slug])
+}
+
+model PartnershipLead {
+  id             String   @id @default(uuid())
+  name           String
+  phone          String
+  email          String?
+  desiredPackage String?
+  isProcessed    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model Article {
+  id         String   @id @default(uuid())
+  slug       String   @unique
+  title      String
+  topic      String
+  content    String
+  youtubeUrl String?
+  imageUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 enum Role {
   USER
   ADMIN
 }
 
-model User {
-  id            String    @id @default(uuid())
-  firstName     String?
-  lastName      String?
-  phone         String?   @unique
-  email         String?   @unique
-  passwordHash  String?   // Может быть null для OAuth
-  emailVerified DateTime?
-  image         String?
-  role          Role      @default(USER)
-
-  orders        Order[]
-  accounts      Account[]
-  sessions      Session[]
-  addresses     Address[]
-  reviews       Review[]
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-// NextAuth OAuth accounts
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-// Адреса доставки пользователя
-model Address {
-  id         String  @id @default(uuid())
-  userId     String
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  label      String? // "Дом", "Работа"
-  city       String
-  street     String
-  building   String
-  apartment  String?
-  entrance   String?
-  floor      String?
-  isDefault  Boolean @default(false)
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-// --- КАТАЛОГ И ТОВАРЫ ---
 enum Category {
   PROBIOTIC
   CANDLES
   ACTIVES
 }
 
-model Product {
-  id            String   @id @default(uuid())
-  slug          String   @unique
-  name          String
-  category      Category
-
-  heroTag       String?
-  form          String?
-  packInfo      String?
-  description   String   @db.Text
-
-  // Для скидок: старая цена зачеркивается, если она больше priceKgs
-  oldPriceKgs   Int?
-  priceKgs      Int
-
-  inStock       Boolean  @default(true) // Наличие товара
-
-  // Массивы строк храним в формате JSON (особенности Prisma)
-  shortBenefits Json     // string[]
-  forWhom       Json?    // string[]
-  keyNotes      Json?    // string[]
-  howToUse      Json?    // string[]
-  cautions      Json?    // string[]
-  storage       Json?    // string[]
-  images        Json     // { src: string, alt: string }[]
-
-  orderItems    OrderItem[]
-  reviews       Review[]
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-// Отзывы на товары
-model Review {
-  id         String   @id @default(uuid())
-  productId  String
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  name       String   // Имя (если гость) или имя пользователя
-  rating     Int      // 1-5 звезд
-  text       String   @db.Text
-  images     Json?    // массив URL изображений (опционально)
-
-  isApproved Boolean  @default(true) // Автопубликация
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-// --- ЗАКАЗЫ (КОРЗИНА) ---
 enum OrderStatus {
   PENDING
-  PROCESSING
+  PAID
   SHIPPED
   DELIVERED
   CANCELLED
-}
-
-model Order {
-  id             String      @id @default(cuid())
-  createdAt      DateTime    @default(now())
-  customerName   String
-  customerPhone  String
-  customerEmail  String?
-  status         OrderStatus @default(PENDING)
-  totalPrice     Float
-
-  // Адрес доставки
-  city           String?
-  street         String?
-  building       String?
-  apartment      String?
-  deliveryNotes  String?
-
-  // Реквизиты оплаты (WhatsApp сообщение)
-  paymentDetails String?     @db.Text
-
-  items          OrderItem[]
-  userId         String?
-  user           User?       @relation(fields: [userId], references: [id])
-
-  updatedAt      DateTime    @updatedAt
-}
-
-// Добавь в модель OrderItem поле productId для связи с Product
-model OrderItem {
-  id          String  @id @default(cuid())
-  orderId     String
-  order       Order   @relation(fields: [orderId], references: [id])
-
-  // ДОБАВЬ ЭТИ ТРИ СТРОКИ:
-  productSlug String
-  product     Product @relation(fields: [productSlug], references: [slug])
-
-  name        String
-  price       Float
-  quantity    Int
-}
-
-// --- ЗАЯВКИ НА ПАРТНЕРСТВО (МАРКЕТИНГ) ---
-model PartnershipLead {
-  id             String   @id @default(uuid())
-  name           String
-  phone          String
-  email          String?
-  desiredPackage String?  // Small, Medium, Big, VIP (если выбрал на сайте)
-  isProcessed    Boolean  @default(false) // Статус для админки: обработана ли заявка
-
-  createdAt      DateTime @default(now())
-}
-
-// --- ИНФОРМАЦИОННЫЙ БЛОК (БЛОГ / МИКРОБИОМ) ---
-model Article {
-  id         String   @id @default(uuid())
-  slug       String   @unique
-  title      String
-  topic      String   // 'Кожа', 'Кишечник', 'Мозг', 'Аутизм'
-  content    String   @db.Text
-  youtubeUrl String?  // Ссылка на видео для iframe
-  imageUrl   String?  // Обложка статьи
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 }

@@ -31,6 +31,7 @@ export default function Header() {
                 <div className="container mx-auto px-4 md:px-12 py-3 flex items-center justify-between">
                     <Link href="/" className="flex items-center z-50">
                         <Image src="/images/logo-main.webp" alt="EnergyMax Logo" width={130} height={32} className="object-contain" priority />
+                        <h1>GROUP</h1>
                     </Link>
 
                     <nav className="hidden md:flex items-center gap-6 font-bold text-[#29380E]/90 text-[13px] tracking-wide uppercase">

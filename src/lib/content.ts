@@ -11,7 +11,7 @@ export const siteConfig = {
     pickupHours: "8:00–22:00",
     instagram: "@prozdorovie_kg",
     telegram: "@nargizfullstack",
-    freeDeliveryFromKgs: 5600,
+    freeDeliveryFromKgs: 5500,
     currency: "сом",
     currencyCode: "KGS",
     paymentMethods: ["QR-перевод", "MBank", "Optima"],
@@ -97,7 +97,7 @@ export const trustBadges = [
     "Официальная продукция Energymax Group",
     "Доставка по Кыргызстану",
     "Самовывоз: Малдыбаева 25",
-    "Бесплатная доставка от 5600 сом",
+    "Бесплатная доставка от 5500 сом",
     "Оплата переводом по QR",
     "Подтверждение заказа через WhatsApp",
 ];
@@ -199,7 +199,7 @@ export const products: Product[] = [
         badges: [
             "Флагман линейки",
             "Семейный формат",
-            "Бесплатная доставка от 5600 сом",
+            "Бесплатная доставка от 5500 сом",
         ],
         tags: ["пробиотик", "микрофлора", "ЖКТ", "семья", "Energymax"],
         faq: [
@@ -269,14 +269,14 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#21AA57]/20 via-[#7ED957]/10 to-transparent",
         availability: "in_stock",
-        oldPriceKgs: 8000,
-        priceKgs: 5600,
+        oldPriceKgs: 5600,
+        priceKgs: 5500,
         variants: [
             { id: "liquid-1", title: "1 бутылка", priceKgs: 600 },
             {
                 id: "liquid-10",
                 title: "Курс 10 бутылок",
-                priceKgs: 5600,
+                priceKgs: 5500,
                 badge: "Бесплатная доставка",
                 pv: 50,
             },
@@ -341,7 +341,7 @@ export const products: Product[] = [
         badges: [
             "Travel-friendly",
             "20 саше",
-            "Бесплатная доставка от 5600 сом",
+            "Бесплатная доставка от 5500 сом",
         ],
         tags: ["саше", "пробиотик", "микрофлора", "дорога", "Energymax"],
         faq: [
@@ -384,13 +384,18 @@ export const products: Product[] = [
         ],
         images: [
             {
-                src: "/images/suhoiMaxilin.jpeg",
-                alt: "Упаковка сухого Максилина в саше",
+                src: "/images/suxoi-maksilin.svg",
+                alt: "Сухой Максилин на чистом фоне",
                 type: "pack",
             },
             {
                 src: "/images/dry-maxilin.png",
                 alt: "Сухой Максилин на чистом фоне",
+                type: "pack",
+            },
+            {
+                src: "/images/suhoiMaxilin.jpeg",
+                alt: "Упаковка сухого Максилина в саше",
                 type: "pack",
             },
             {
@@ -401,14 +406,14 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#21AA57]/10 via-[#A8A496]/10 to-transparent",
         availability: "in_stock",
-        oldPriceKgs: 8000,
-        priceKgs: 5600,
+        oldPriceKgs: 5600,
+        priceKgs: 5500,
         variants: [
             { id: "dry-1", title: "1 саше", priceKgs: 350 },
             {
                 id: "dry-20",
                 title: "Упаковка 20 саше",
-                priceKgs: 5600,
+                priceKgs: 5500,
                 badge: "Бесплатная доставка",
                 pv: 50,
             },
@@ -529,13 +534,13 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#D4AF37]/20 via-[#FFE8A3]/10 to-transparent",
         availability: "in_stock",
-        oldPriceKgs: 6500,
-        priceKgs: 5600,
+        oldPriceKgs: 5600,
+        priceKgs: 5500,
         variants: [
             {
                 id: "candles-10",
                 title: "10 суппозиториев",
-                priceKgs: 5600,
+                priceKgs: 5500,
                 pv: 50,
             },
         ],
@@ -611,7 +616,7 @@ export const products: Product[] = [
             {
                 question: "Сколько стоит?",
                 answer:
-                    "1 флакон — 3000 сом, 2 флакона — 5600 сом.",
+                    "1 флакон — 2800 сом, 2 флакона — 5500 сом.",
             },
             {
                 question: "Кому может подойти?",
@@ -664,19 +669,364 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#29380E]/20 via-[#5F7A1F]/10 to-transparent",
         availability: "in_stock",
-        oldPriceKgs: 6000,
-        priceKgs: 5600,
+        oldPriceKgs: 5600,
+        priceKgs: 5500,
         variants: [
             { id: "arginine-1", title: "1 флакон", priceKgs: 3000, pv: 25 },
             {
                 id: "arginine-2",
                 title: "2 флакона",
-                priceKgs: 5600,
+                priceKgs: 5500,
                 badge: "Выгоднее",
                 pv: 50,
             },
         ],
         relatedSlugs: ["vitgrass", "maxilin-liquid"],
+    },
+    {
+        slug: "l-arginine-tmin",
+        name: "L-Аргинин — Тмин",
+        category: "actives",
+        heroTag: "Поддержка сосудов и энергии",
+        subtitle: "Подъязычный формат со вкусом тмина",
+        form: "Подъязычный гель / капли",
+        packInfo: "1 флакон",
+        shortBenefits: [
+            "Поддержка энергии и тонуса",
+            "Поддержка микроциркуляции",
+            "Удобный подъязычный формат",
+            "Натуральный вкус тмина",
+        ],
+        description:
+            "L-Аргинин со вкусом тмина — подъязычный формат для ежедневного режима. Удобен для тех, кто хочет выбрать конкретный вкус и понятную отдельную позицию в каталоге.",
+        forWhom: [
+            "Для активных людей",
+            "Для тех, кто хочет поддерживать повседневный тонус",
+            "Для тех, кому нравится вкус тмина",
+        ],
+        keyNotes: [
+            "Отдельная SKU-позиция",
+            "Подъязычный формат",
+            "Вкус: тмин",
+            "1 флакон",
+        ],
+        features: [
+            "Удобный формат для каталога и корзины",
+            "Понятный выбор по вкусу",
+            "Отдельная карточка товара",
+        ],
+        howToUse: [
+            "Принимать по индивидуальной схеме",
+            "Обычно начинают с малых доз",
+            "Соблюдать питьевой режим",
+        ],
+        dosageNote:
+            "Схема приема подбирается индивидуально.",
+        cautions: [
+            "Индивидуальная непереносимость компонентов",
+            "При беременности, лактации и приеме препаратов лучше согласовать со специалистом",
+        ],
+        storage: [
+            "Хранить по инструкции на упаковке",
+            "Беречь от перегрева и прямого солнца",
+        ],
+        composition:
+            "L-аргинин, вода очищенная, натуральные вкусовые компоненты.",
+        badges: ["1 флакон", "Вкус тмин", "Подъязычный формат"],
+        tags: ["L-аргинин", "тмин", "энергия", "сосуды", "Energymax"],
+        faq: [
+            {
+                question: "Какой это вкус?",
+                answer: "Это вариант L-Аргинина со вкусом тмина.",
+            },
+            {
+                question: "Сколько стоит?",
+                answer: "1 флакон — 3000 сом.",
+            },
+        ],
+        seoTitle: "L-Аргинин Тмин — Energymax | probiotic.kg",
+        seoDescription:
+            "L-Аргинин со вкусом тмина. Подъязычный формат для ежедневного режима.",
+        reviews: [
+            {
+                name: "Жылдыз",
+                rating: 5,
+                text: "Выбрала вариант с тмином. Удобный формат и понятный вкус.",
+            },
+        ],
+        images: [
+            {
+                src: "/images/larginine-tmin.png",
+                alt: "L-Аргинин вкус тмин",
+                type: "flavor",
+            },
+            {
+                src: "/images/larginine.webp",
+                alt: "L-Аргинин Energymax",
+                type: "pack",
+            },
+        ],
+        imageBg: "from-[#29380E]/20 via-[#5F7A1F]/10 to-transparent",
+        availability: "in_stock",
+        oldPriceKgs: 3000,
+        priceKgs: 3000,
+        variants: [
+            { id: "arginine-tmin-1", title: "1 флакон", priceKgs: 3000, pv: 25 },
+        ],
+        relatedSlugs: ["l-arginine-tmin-gvozdika", "l-arginine-gvozdika", "l-arginine-myata"],
+    },
+    {
+        slug: "l-arginine-tmin-gvozdika",
+        name: "L-Аргинин — Тмин + гвоздика",
+        category: "actives",
+        heroTag: "Поддержка сосудов и энергии",
+        subtitle: "Подъязычный формат со вкусом тмин + гвоздика",
+        form: "Подъязычный гель / капли",
+        packInfo: "1 флакон",
+        shortBenefits: [
+            "Поддержка энергии и тонуса",
+            "Поддержка микроциркуляции",
+            "Удобный подъязычный формат",
+            "Комбинированный вкус",
+        ],
+        description:
+            "L-Аргинин со вкусом тмин + гвоздика — отдельная SKU-позиция для каталога, корзины и seed-базы.",
+        forWhom: [
+            "Для активных людей",
+            "Для тех, кто хочет выбрать отдельный вкус",
+            "Для тех, кому нравится более насыщенный аромат",
+        ],
+        keyNotes: [
+            "Отдельная SKU-позиция",
+            "Вкус: тмин + гвоздика",
+            "1 флакон",
+        ],
+        features: [
+            "Отдельная карточка товара",
+            "Понятный выбор в каталоге",
+            "Удобно для seed и корзины",
+        ],
+        howToUse: [
+            "Принимать по индивидуальной схеме",
+            "Обычно начинают с малых доз",
+        ],
+        dosageNote: "Схема приема подбирается индивидуально.",
+        cautions: [
+            "Индивидуальная непереносимость компонентов",
+            "При беременности, лактации и приеме препаратов лучше согласовать со специалистом",
+        ],
+        storage: [
+            "Хранить по инструкции на упаковке",
+            "Беречь от перегрева и прямого солнца",
+        ],
+        composition:
+            "L-аргинин, вода очищенная, натуральные вкусовые компоненты.",
+        badges: ["1 флакон", "Тмин + гвоздика", "Подъязычный формат"],
+        tags: ["L-аргинин", "тмин", "гвоздика", "энергия", "Energymax"],
+        faq: [
+            {
+                question: "Какой это вкус?",
+                answer: "Это вариант L-Аргинина со вкусом тмин + гвоздика.",
+            },
+            {
+                question: "Сколько стоит?",
+                answer: "1 флакон — 3000 сом.",
+            },
+        ],
+        seoTitle: "L-Аргинин Тмин + Гвоздика — Energymax | probiotic.kg",
+        seoDescription:
+            "L-Аргинин со вкусом тмин + гвоздика. Подъязычный формат для ежедневного режима.",
+        reviews: [],
+        images: [
+            {
+                src: "/images/larginine-tmin-gvozdika.png",
+                alt: "L-Аргинин вкус тмин и гвоздика",
+                type: "flavor",
+            },
+            {
+                src: "/images/larginine.webp",
+                alt: "L-Аргинин Energymax",
+                type: "pack",
+            },
+        ],
+        imageBg: "from-[#29380E]/20 via-[#5F7A1F]/10 to-transparent",
+        availability: "in_stock",
+        oldPriceKgs: 3000,
+        priceKgs: 3000,
+        variants: [
+            { id: "arginine-tmin-gvozdika-1", title: "1 флакон", priceKgs: 3000, pv: 25 },
+        ],
+        relatedSlugs: ["l-arginine-tmin", "l-arginine-gvozdika", "l-arginine-myata"],
+    },
+    {
+        slug: "l-arginine-gvozdika",
+        name: "L-Аргинин — Гвоздика",
+        category: "actives",
+        heroTag: "Поддержка сосудов и энергии",
+        subtitle: "Подъязычный формат со вкусом гвоздики",
+        form: "Подъязычный гель / капли",
+        packInfo: "1 флакон",
+        shortBenefits: [
+            "Поддержка энергии и тонуса",
+            "Поддержка микроциркуляции",
+            "Удобный подъязычный формат",
+            "Выраженный вкус гвоздики",
+        ],
+        description:
+            "L-Аргинин со вкусом гвоздики — отдельная товарная позиция для каталога и seed-базы.",
+        forWhom: [
+            "Для активных людей",
+            "Для тех, кто хочет выбрать вкус гвоздики",
+        ],
+        keyNotes: [
+            "Отдельная SKU-позиция",
+            "Вкус: гвоздика",
+            "1 флакон",
+        ],
+        features: [
+            "Отдельная карточка товара",
+            "Понятная структура каталога",
+            "Удобно для seed",
+        ],
+        howToUse: [
+            "Принимать по индивидуальной схеме",
+            "Обычно начинают с малых доз",
+        ],
+        dosageNote: "Схема приема подбирается индивидуально.",
+        cautions: [
+            "Индивидуальная непереносимость компонентов",
+            "При беременности, лактации и приеме препаратов лучше согласовать со специалистом",
+        ],
+        storage: [
+            "Хранить по инструкции на упаковке",
+            "Беречь от перегрева и прямого солнца",
+        ],
+        composition:
+            "L-аргинин, вода очищенная, натуральные вкусовые компоненты.",
+        badges: ["1 флакон", "Вкус гвоздика", "Подъязычный формат"],
+        tags: ["L-аргинин", "гвоздика", "энергия", "сосуды", "Energymax"],
+        faq: [
+            {
+                question: "Какой это вкус?",
+                answer: "Это вариант L-Аргинина со вкусом гвоздики.",
+            },
+            {
+                question: "Сколько стоит?",
+                answer: "1 флакон — 3000 сом.",
+            },
+        ],
+        seoTitle: "L-Аргинин Гвоздика — Energymax | probiotic.kg",
+        seoDescription:
+            "L-Аргинин со вкусом гвоздики. Подъязычный формат для ежедневного режима.",
+        reviews: [],
+        images: [
+            {
+                src: "/images/larginine-gvozdika.png",
+                alt: "L-Аргинин вкус гвоздика",
+                type: "flavor",
+            },
+            {
+                src: "/images/larginine.webp",
+                alt: "L-Аргинин Energymax",
+                type: "pack",
+            },
+        ],
+        imageBg: "from-[#29380E]/20 via-[#5F7A1F]/10 to-transparent",
+        availability: "in_stock",
+        oldPriceKgs: 3000,
+        priceKgs: 3000,
+        variants: [
+            { id: "arginine-gvozdika-1", title: "1 флакон", priceKgs: 3000, pv: 25 },
+        ],
+        relatedSlugs: ["l-arginine-tmin", "l-arginine-tmin-gvozdika", "l-arginine-myata"],
+    },
+    {
+        slug: "l-arginine-myata",
+        name: "L-Аргинин — Мята",
+        category: "actives",
+        heroTag: "Поддержка сосудов и энергии",
+        subtitle: "Подъязычный формат со вкусом мяты",
+        form: "Подъязычный гель / капли",
+        packInfo: "1 флакон",
+        shortBenefits: [
+            "Поддержка энергии и тонуса",
+            "Поддержка микроциркуляции",
+            "Удобный подъязычный формат",
+            "Освежающий вкус мяты",
+        ],
+        description:
+            "L-Аргинин со вкусом мяты — отдельная позиция для каталога, корзины и seed-синхронизации.",
+        forWhom: [
+            "Для активных людей",
+            "Для тех, кто предпочитает мятный вкус",
+        ],
+        keyNotes: [
+            "Отдельная SKU-позиция",
+            "Вкус: мята",
+            "1 флакон",
+        ],
+        features: [
+            "Отдельная карточка товара",
+            "Удобно для каталога",
+            "Чистая структура seed-данных",
+        ],
+        howToUse: [
+            "Принимать по индивидуальной схеме",
+            "Обычно начинают с малых доз",
+        ],
+        dosageNote: "Схема приема подбирается индивидуально.",
+        cautions: [
+            "Индивидуальная непереносимость компонентов",
+            "При беременности, лактации и приеме препаратов лучше согласовать со специалистом",
+        ],
+        storage: [
+            "Хранить по инструкции на упаковке",
+            "Беречь от перегрева и прямого солнца",
+        ],
+        composition:
+            "L-аргинин, вода очищенная, натуральные вкусовые компоненты.",
+        badges: ["1 флакон", "Вкус мята", "Подъязычный формат"],
+        tags: ["L-аргинин", "мята", "энергия", "сосуды", "Energymax"],
+        faq: [
+            {
+                question: "Какой это вкус?",
+                answer: "Это вариант L-Аргинина со вкусом мяты.",
+            },
+            {
+                question: "Сколько стоит?",
+                answer: "1 флакон — 3000 сом.",
+            },
+        ],
+        seoTitle: "L-Аргинин Мята — Energymax | probiotic.kg",
+        seoDescription:
+            "L-Аргинин со вкусом мяты. Подъязычный формат для ежедневного режима.",
+        reviews: [
+            {
+                name: "Руслан",
+                rating: 5,
+                text: "Нравится именно вкус мяты. Удобно использовать утром.",
+            },
+        ],
+        images: [
+            {
+                src: "/images/larginine-miata.png",
+                alt: "L-Аргинин вкус мята",
+                type: "flavor",
+            },
+            {
+                src: "/images/larginine.webp",
+                alt: "L-Аргинин Energymax",
+                type: "pack",
+            },
+        ],
+        imageBg: "from-[#29380E]/20 via-[#5F7A1F]/10 to-transparent",
+        availability: "in_stock",
+        oldPriceKgs: 3000,
+        priceKgs: 3000,
+        variants: [
+            { id: "arginine-myata-1", title: "1 флакон", priceKgs: 3000, pv: 25 },
+        ],
+        relatedSlugs: ["l-arginine-tmin", "l-arginine-tmin-gvozdika", "l-arginine-gvozdika"],
     },
 
     {
@@ -781,13 +1131,13 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#21AA57]/30 via-[#B8E986]/10 to-transparent",
         availability: "in_stock",
-        oldPriceKgs: 6000,
-        priceKgs: 5600,
+        oldPriceKgs: 5600,
+        priceKgs: 5500,
         variants: [
             {
                 id: "vitgrass-400",
                 title: "Банка ~400 г",
-                priceKgs: 5600,
+                priceKgs: 5500,
                 pv: 50,
             },
         ],

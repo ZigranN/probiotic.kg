@@ -51,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     id: user.id,
                     email: user.email,
                     name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-                    image: user.image,
+                    image: null,
                     role: user.role,
                 };
             },

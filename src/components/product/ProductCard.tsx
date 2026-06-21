@@ -13,8 +13,8 @@ export default function ProductCard({ product }: { product: any }) {
         <div className="bg-white p-4 rounded-[2.5rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full group relative overflow-hidden">
             {/* Бэдж скидки или Хит */}
             {product.oldPriceKgs && (
-                <div className="absolute top-6 left-6 z-10 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-pulse">
-                    SALE
+                <div className="absolute top-6 left-6 z-10 bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-pulse">
+                    В НАЛИЧИИ
                 </div>
             )}
 

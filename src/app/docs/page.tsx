@@ -5,19 +5,19 @@ export default function DocsPage() {
         {
             title: "Сертификат соответствия",
             description: "Сертификат качества продукции EnergyMax",
-            file: "/documents/certificate.pdf",
+            file: "/docLarginine/certificate.pdf",
             size: "1.2 MB",
         },
         {
             title: "Декларация о составе",
             description: "Полный состав пробиотика Максилин",
-            file: "/documents/declaration.pdf",
+            file: "/docLarginine/declaration.pdf",
             size: "850 KB",
         },
         {
             title: "Инструкция по применению",
             description: "Подробная инструкция по использованию продукции",
-            file: "/documents/instruction.pdf",
+            file: "/docLarginine/instruction.pdf",
             size: "2.1 MB",
         },
     ];

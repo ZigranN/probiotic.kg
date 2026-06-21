@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CheckCircle, BotMessageSquare } from "lucide-react";
 
 export default function Home() {
+
     return (
         <div className="relative flex flex-col bg-[#F4F7F5]">
 

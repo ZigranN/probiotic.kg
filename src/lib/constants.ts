@@ -10,7 +10,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:30
 export const CONTACTS = {
   whatsapp: WHATSAPP_PHONE,
   email: SUPPORT_EMAIL,
-  address: "ТЦ Вефа Блок С, 8 этаж, офис Energymax Group / ул. Малдыбаева 25",
+  address: "ТЦ Вефа Блок ,офис Energymax Group / ул. Малдыбаева 25",
   instagram: "@prozdorovie_kg",
   telegram: "@nargizfullstack",
 } as const;

@@ -1,235 +1,795 @@
-"use client";
+import type { Metadata } from "next";
 
-export const dynamic = 'force-dynamic';
+import Link from "next/link";
 
-import { motion } from "framer-motion";
 import {
-    Zap,
-    TrendingUp,
-    Users,
-    Wallet,
-    Award,
-    CheckCircle2,
     ArrowRight,
+    BadgeCheck,
+    CheckCircle2,
+    ExternalLink,
+    FileText,
+    Globe2,
+    MessageCircle,
+    PackageCheck,
+    ShieldCheck,
+    ShoppingBag,
+    UserPlus,
+    Users,
 } from "lucide-react";
-import { siteConfig } from "@/lib/content";
 
-// Временные данные маркетинг плана (TODO: перенести в content.ts)
-const marketingPlan = {
-    packages: [
-        {
-            id: 'starter',
-            name: 'Стартовый',
-            priceKgs: 5600,
-            pv: 100,
-            benefits: ['1 продукт на выбор', 'Доступ к обучению', 'Личный кабинет'],
-        },
-        {
-            id: 'business',
-            name: 'Бизнес',
-            priceKgs: 16800,
-            pv: 300,
-            benefits: ['3 продукта', 'Маркетинг материалы', 'Менторская поддержка'],
-        },
-        {
-            id: 'premium',
-            name: 'Премиум',
-            priceKgs: 56000,
-            pv: 1000,
-            benefits: ['10 продуктов', 'VIP поддержка', 'Максимальные бонусы'],
-        },
-    ],
+import { seller } from "@/config/seller";
+
+// ==========================================
+// EXTERNAL ENERGYMAX LINKS
+// ==========================================
+
+const KYRGYZSTAN_REGISTRATION_URL =
+    "https://energymaxgroup.kg/cabinet/registration?invite=8e1245214efcc80803f6e0215e999eae";
+
+const RUSSIA_SHOP_URL =
+    "https://nrg-max.ru/cabinet/referral-shop/7fb8399cfd0b74f7ae6d88188e78e439";
+
+// ==========================================
+// SEO
+// ==========================================
+
+export const metadata: Metadata = {
+    title: "Партнёрство EnergyMax в Кыргызстане",
+
+    description:
+        "Регистрация партнёра EnergyMax в Кыргызстане, стартовые пакеты Medium, Big и VIP, а также реферальная ссылка для покупки продукции в России.",
+
+    alternates: {
+        canonical: "/business",
+    },
+
+    /*
+     * Пока маркетинг-план не привязан
+     * к отдельному официальному документу
+     * с датой редакции, страницу оставляем noindex.
+     *
+     * Пользователи сайта страницу видеть могут.
+     */
+    robots: {
+        index: false,
+        follow: true,
+    },
 };
 
+// ==========================================
+// MARKETING PLAN
+// ==========================================
+//
+// Текущие условия, предоставленные для сайта.
+//
+// ВАЖНО:
+// условия маркетинг-плана могут изменяться.
+// Перед активацией пользователь должен
+// проверить актуальные значения в кабинете.
+// ==========================================
+
+const activationPackages = [
+    {
+        id: "medium",
+
+        name: "Medium",
+
+        price: "$125",
+
+        pv: "100 PV",
+
+        rank: "Партнёр",
+
+        binary: "10%",
+
+        description:
+            "Стартовый пакет для знакомства с партнёрской системой EnergyMax.",
+
+        benefits: [
+            "Активация на 100 PV",
+            "Стартовый ранг «Партнёр»",
+            "Бинарный бонус — 10%",
+        ],
+
+        recommended: false,
+    },
+
+    {
+        id: "big",
+
+        name: "Big",
+
+        price: "$380",
+
+        pv: "250 PV",
+
+        rank: "Менеджер",
+
+        binary: "12%",
+
+        description:
+            "Расширенный стартовый пакет для тех, кто планирует активнее развивать партнёрское направление.",
+
+        benefits: [
+            "Активация на 250 PV",
+            "Стартовый ранг «Менеджер»",
+            "Бинарный бонус — 12%",
+            "$150 на cashback-счёт для покупок",
+        ],
+
+        recommended: true,
+    },
+
+    {
+        id: "vip",
+
+        name: "VIP",
+
+        price: "$1000",
+
+        pv: "650 PV",
+
+        rank: "Бронзовый директор",
+
+        binary: "14%",
+
+        description:
+            "Максимальный из представленных стартовых пакетов с более высоким стартовым рангом.",
+
+        benefits: [
+            "Активация на 650 PV",
+            "Стартовый ранг «Бронзовый директор»",
+            "Бинарный бонус — 14%",
+            "$250 на cashback-счёт",
+        ],
+
+        recommended: false,
+    },
+] as const;
+
+// ==========================================
+// PRINCIPLES
+// ==========================================
+
+const importantPoints = [
+    {
+        icon: UserPlus,
+
+        title: "Самостоятельная регистрация",
+
+        text:
+            "Для Кыргызстана можно самостоятельно открыть форму регистрации EnergyMax по партнёрской ссылке и создать аккаунт.",
+    },
+
+    {
+        icon: PackageCheck,
+
+        title: "Выбор пакета",
+
+        text:
+            "После регистрации можно ознакомиться с доступными вариантами активации и выбрать подходящий пакет.",
+    },
+
+    {
+        icon: ShieldCheck,
+
+        title: "Проверка условий",
+
+        text:
+            "Стоимость, PV, бонусы, cashback, ранги и другие условия необходимо повторно проверить в личном кабинете непосредственно перед активацией.",
+    },
+
+    {
+        icon: Users,
+
+        title: "Без гарантии дохода",
+
+        text:
+            "Участие в маркетинг-плане не означает гарантированный заработок. Вознаграждение зависит от фактического товарооборота, структуры и выполнения условий программы.",
+    },
+] as const;
+
+// ==========================================
+// PAGE
+// ==========================================
+
 export default function BusinessPage() {
-    // Оставляем только 3 основных пакета для солидности
-    const premiumPackages = marketingPlan.packages.filter(pkg => pkg.id !== 'small');
+    const consultationText = encodeURIComponent(
+        `Здравствуйте! Меня интересует партнёрство EnergyMax в Кыргызстане. Я перешёл(а) со страницы ${seller.siteName}/business.`,
+    );
+
+    const consultationUrl =
+        `https://wa.me/${seller.whatsappPhone}?text=${consultationText}`;
 
     return (
-        <div className="min-h-screen bg-[#F4F7F5] pb-24">
+        <main className="min-h-screen bg-[#F4F7F5] pb-24">
+            {/* ==================================
+                HERO
+            ================================== */}
 
-            {/* 1. HERO СЕКЦИЯ */}
-            <section className="relative pt-20 pb-16 overflow-hidden bg-[#29380E] text-white">
-                <div className="absolute inset-0 opacity-10 bg-cover bg-center" style={{backgroundImage: "url('/images/bg-leaves.jpg')"}}></div>
-                <div className="container mx-auto px-6 relative z-10 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 bg-[#D4AF37]/20 text-[#D4AF37] px-4 py-2 rounded-full font-bold text-sm mb-6 border border-[#D4AF37]/30 uppercase tracking-widest"
-                    >
-                        <Zap className="w-4 h-4 fill-current" />
-                        Бизнес-возможности EnergyMax Group
-                    </motion.div>
-                    <h1 className="text-4xl md:text-7xl font-black mb-6 font-heading tracking-tight italic uppercase leading-none">
-                        Твой путь к <span className="text-[#21AA57]">финансовой</span> свободе
+            <section className="relative overflow-hidden bg-[#29380E] py-20 text-white md:py-28">
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                >
+                    <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-[#21AA57]/20 blur-3xl" />
+
+                    <div className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
+                </div>
+
+                <div className="container relative z-10 mx-auto px-4 text-center md:px-6">
+                    <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+                        <Users
+                            className="h-4 w-4 text-[#21AA57]"
+                            aria-hidden="true"
+                        />
+
+                        <span className="text-xs font-black tracking-[0.2em] text-white/75 uppercase">
+                            Партнёрство EnergyMax
+                        </span>
+                    </div>
+
+                    <h1 className="mx-auto mb-6 max-w-5xl text-4xl font-black leading-none tracking-tight uppercase italic md:text-6xl lg:text-7xl">
+                        Начать сотрудничество
+                        <br />
+
+                        <span className="text-[#21AA57]">
+                            можно самостоятельно
+                        </span>
                     </h1>
-                    <p className="text-lg md:text-2xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-                        Станьте партнером международного холдинга и получайте вознаграждения в рамках инновационного маркетинга.
+
+                    <p className="mx-auto max-w-3xl text-base leading-8 text-white/65 md:text-lg">
+                        Регистрация EnergyMax для Кыргызстана,
+                        стартовые пакеты Medium, Big и VIP,
+                        а также отдельная реферальная ссылка
+                        для покупки продукции в России.
                     </p>
+
+                    {/* HERO CTA */}
+
+                    <div className="mt-10 flex flex-wrap justify-center gap-3">
+                        <a
+                            href={KYRGYZSTAN_REGISTRATION_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-[#21AA57] px-7 py-4 text-sm font-black text-white transition-transform hover:scale-[1.02]"
+                        >
+                            <UserPlus
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                            />
+
+                            Регистрация в Кыргызстане
+
+                            <ExternalLink
+                                className="h-4 w-4"
+                                aria-hidden="true"
+                            />
+                        </a>
+
+                        <a
+                            href={RUSSIA_SHOP_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-7 py-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+                        >
+                            <ShoppingBag
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                            />
+
+                            Купить в России
+
+                            <ExternalLink
+                                className="h-4 w-4"
+                                aria-hidden="true"
+                            />
+                        </a>
+                    </div>
                 </div>
             </section>
 
-            <div className="container mx-auto px-6 -mt-14 relative z-20">
+            {/* ==================================
+                COUNTRY LINKS
+            ================================== */}
 
-                {/* 2. ПАКЕТЫ ВХОДА (3 КРУПНЫХ КАРТОЧКИ) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 items-center">
-                    {premiumPackages.map((pkg, idx) => (
-                        <motion.div
-                            key={pkg.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.15 }}
-                            className={`bg-white rounded-[3rem] p-10 shadow-2xl border-4 transition-all hover:-translate-y-3 flex flex-col relative overflow-hidden ${
-                                pkg.id === 'vip' ? 'border-[#21AA57] md:scale-105 z-10 py-14' : 'border-transparent'
-                            }`}
-                        >
-                            {/* Метка для VIP */}
-                            {pkg.id === 'vip' && (
-                                <div className="absolute top-0 right-0 bg-[#21AA57] text-white px-6 py-2 rounded-bl-3xl font-bold text-xs uppercase tracking-widest">
-                                    Самый выгодный
-                                </div>
-                            )}
+            <section className="relative z-10 -mt-10">
+                <div className="container mx-auto px-4 md:px-6">
+                    <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2">
+                        {/* KYRGYZSTAN */}
 
-                            <h3 className="text-3xl font-black text-[#29380E] mb-4 uppercase italic tracking-tighter">{pkg.name}</h3>
-
-                            <div className="flex items-baseline gap-1 mb-2">
-                                <span className="text-5xl font-black text-[#21AA57]">${pkg.priceKgs}</span>
+                        <article className="rounded-[2.5rem] border border-gray-100 bg-white p-7 shadow-xl md:p-9">
+                            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#21AA57]/10">
+                                <UserPlus
+                                    className="h-7 w-7 text-[#21AA57]"
+                                    aria-hidden="true"
+                                />
                             </div>
 
-                            <div className="text-[#A8A496] font-bold text-sm uppercase tracking-widest mb-8 pb-4 border-b border-gray-100">
-                                {pkg.pv} PV
-                            </div>
+                            <p className="mb-2 text-xs font-black tracking-[0.18em] text-[#21AA57] uppercase">
+                                Кыргызстан
+                            </p>
 
-                            <ul className="space-y-5 mb-10 flex-grow">
-                                {pkg.benefits.map((benefit, idx) => (
-                                    <li key={idx} className="flex items-start gap-3 text-base text-[#29380E]/80">
-                                        <CheckCircle2 className="w-6 h-6 text-[#21AA57] flex-shrink-0" />
-                                        <span>{benefit}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                            <h2 className="mb-4 text-2xl font-black tracking-tight text-[#29380E]">
+                                Партнёрская регистрация
+                            </h2>
+
+                            <p className="mb-6 text-sm leading-7 text-[#29380E]/60">
+                                Перейдите на страницу EnergyMax,
+                                заполните регистрационную форму
+                                и создайте личный кабинет
+                                самостоятельно.
+                            </p>
 
                             <a
-                                href={`https://wa.me/${siteConfig.whatsappPhone}?text=Здравствуйте! Хочу стать партнером на пакет ${pkg.name}`}
+                                href={KYRGYZSTAN_REGISTRATION_URL}
                                 target="_blank"
-                                className={`w-full py-5 rounded-2xl font-black text-lg uppercase tracking-tighter transition-all text-center ${
-                                    pkg.id === 'vip'
-                                        ? 'bg-[#21AA57] text-white shadow-xl shadow-[#21AA57]/30 hover:bg-[#1d914a]'
-                                        : 'bg-[#F4F7F5] text-[#29380E] hover:bg-[#29380E] hover:text-white'
-                                }`}
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 rounded-xl bg-[#21AA57] px-5 py-3 text-sm font-black text-white transition-transform hover:scale-[1.02]"
                             >
-                                Выбрать {pkg.name}
+                                Зарегистрироваться
+
+                                <ArrowRight
+                                    className="h-4 w-4"
+                                    aria-hidden="true"
+                                />
                             </a>
-                        </motion.div>
-                    ))}
+                        </article>
+
+                        {/* RUSSIA */}
+
+                        <article className="rounded-[2.5rem] border border-gray-100 bg-white p-7 shadow-xl md:p-9">
+                            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#29380E]/5">
+                                <ShoppingBag
+                                    className="h-7 w-7 text-[#29380E]"
+                                    aria-hidden="true"
+                                />
+                            </div>
+
+                            <p className="mb-2 text-xs font-black tracking-[0.18em] text-[#21AA57] uppercase">
+                                Россия
+                            </p>
+
+                            <h2 className="mb-4 text-2xl font-black tracking-tight text-[#29380E]">
+                                Купить продукцию
+                            </h2>
+
+                            <p className="mb-6 text-sm leading-7 text-[#29380E]/60">
+                                Для покупателей в России
+                                доступен отдельный реферальный
+                                интернет-магазин Energy Max
+                                Group.
+                            </p>
+
+                            <a
+                                href={RUSSIA_SHOP_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 rounded-xl bg-[#29380E] px-5 py-3 text-sm font-black text-white transition-transform hover:scale-[1.02]"
+                            >
+                                Открыть магазин России
+
+                                <ExternalLink
+                                    className="h-4 w-4"
+                                    aria-hidden="true"
+                                />
+                            </a>
+                        </article>
+                    </div>
                 </div>
+            </section>
 
-                {/* 3. РАЗБОР МАРКЕТИНГА (ВИДЕО) */}
-                <section className="py-12 md:py-20">
-                    <div className="bg-[#29380E] rounded-[3rem] p-8 md:p-16 text-white relative overflow-hidden shadow-2xl border border-white/5">
-                        <div className="absolute top-0 left-0 w-64 h-64 bg-[#21AA57]/10 rounded-full blur-[100px]"></div>
+            {/* ==================================
+                MARKETING PLAN INTRO
+            ================================== */}
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start relative z-10">
-                            <div>
-                                <h2 className="text-3xl md:text-5xl font-black uppercase italic leading-none mb-6 tracking-tighter">
-                                    Разбор <br/><span className="text-[#21AA57]">маркетинга</span>
-                                </h2>
-                                <p className="text-white/60 text-lg mb-8 leading-relaxed">
-                                    Посмотрите подробные видео о том, как работает бинарная система, как начисляются PV и как выйти на стабильный доход.
-                                </p>
-                                <div className="space-y-4 mb-8">
-                                    {[
-                                        "Реферальный бонус 20-40%",
-                                        "Бинарный бонус до 24%",
-                                        "Кэшбэк до 100% за покупки"
-                                    ].map((item, idx) => (
-                                        <div key={idx} className="flex items-center gap-4">
-                                            <div className="w-2 h-2 bg-[#21AA57] rounded-full shadow-[0_0_10px_#21AA57]"></div>
-                                            <span className="font-medium text-white/90">{item}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-6 w-full">
-                                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10">
-                                    <iframe
-                                        width="100%" height="100%"
-                                        src="https://www.youtube.com/embed/0Ci4Ppip66Q"
-                                        title="EnergyMax Marketing 1" frameBorder="0"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
-                                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10">
-                                    <iframe
-                                        width="100%" height="100%"
-                                        src="https://www.youtube.com/embed/5HrKAeG4Y9I"
-                                        title="EnergyMax Marketing 2" frameBorder="0"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 4. ПРЕИМУЩЕСТВА И ФОРМА */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-20">
-                    <div>
-                        <h2 className="text-4xl md:text-6xl font-black text-[#29380E] mb-10 uppercase italic leading-none">
-                            Почему выбирают <br/><span className="text-[#21AA57]">наш маркетинг?</span>
-                        </h2>
-                        <div className="grid grid-cols-1 gap-4">
-                            <div className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
-                                <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
-                                    <Users className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">Бинарная система</h4>
-                                    <p className="text-[#A8A496] text-sm leading-relaxed">Зарабатывайте с двух структур одновременно</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
-                                <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
-                                    <TrendingUp className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">Быстрый старт</h4>
-                                    <p className="text-[#A8A496] text-sm leading-relaxed">Начните зарабатывать уже с первой недели</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-5 p-6 bg-white rounded-3xl shadow-sm border border-[#A8A496]/10 hover:shadow-xl transition-all group">
-                                <div className="w-14 h-14 bg-[#21AA57]/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#21AA57] group-hover:text-white transition-colors">
-                                    <Wallet className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-[#29380E] text-xl mb-1 uppercase italic tracking-tighter">До 14% бонуса</h4>
-                                    <p className="text-[#A8A496] text-sm leading-relaxed">Максимальный процент в индустрии</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-[#29380E] rounded-[4rem] p-10 md:p-16 text-white relative overflow-hidden shadow-2xl border border-white/5">
-                        <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#21AA57]/20 rounded-full blur-[100px]"></div>
-                        <h3 className="text-3xl md:text-5xl font-black mb-6 relative z-10 leading-none tracking-tighter italic uppercase">Начни свой <br/><span className="text-[#21AA57]">бизнес сегодня</span></h3>
-                        <p className="text-white/60 mb-10 relative z-10 text-lg">
-                            Оставьте свои данные, и я лично проведу для вас презентацию маркетинга.
+            <section className="py-20">
+                <div className="container mx-auto px-4 md:px-6">
+                    <div className="mx-auto mb-12 max-w-4xl text-center">
+                        <p className="mb-3 text-xs font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                            Маркетинг-план
                         </p>
 
-                        <div className="space-y-5 relative z-10">
-                            <input type="text" placeholder="Ваше имя" className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 outline-none focus:border-[#21AA57] transition-all text-lg" />
-                            <input type="text" placeholder="Ваш телефон (WhatsApp)" className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 outline-none focus:border-[#21AA57] transition-all text-lg" />
-                            <button className="w-full bg-[#21AA57] hover:bg-[#1d914a] text-white py-5 rounded-2xl font-black text-xl shadow-2xl shadow-[#21AA57]/40 transition-all flex items-center justify-center gap-3 active:scale-95 uppercase tracking-tighter">
-                                Получить консультацию
-                                <ArrowRight className="w-6 h-6" />
-                            </button>
+                        <h2 className="mb-5 text-3xl font-black tracking-tight text-[#29380E] uppercase italic md:text-5xl">
+                            Пакеты
+                            <span className="text-[#21AA57]">
+                                {" "}
+                                активации
+                            </span>
+                        </h2>
+
+                        <p className="mx-auto max-w-3xl text-sm leading-7 text-[#29380E]/60 md:text-base">
+                            Выберите стартовый масштаб участия.
+                            Расчётный курс, используемый
+                            в маркетинг-плане:
+                        </p>
+
+                        <div className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-4 shadow-sm">
+                            <BadgeCheck
+                                className="h-5 w-5 text-[#21AA57]"
+                                aria-hidden="true"
+                            />
+
+                            <span className="text-lg font-black text-[#29380E]">
+                                1 PV = $0,68
+                            </span>
                         </div>
-                        <div className="mt-8 text-center opacity-30 text-xs uppercase tracking-widest">
-                            Выгодные условия для партнёров
+                    </div>
+
+                    {/* PACKAGES */}
+
+                    <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3">
+                        {activationPackages.map(
+                            (pkg) => (
+                                <article
+                                    key={pkg.id}
+                                    className={`relative flex flex-col overflow-hidden rounded-[2.25rem] border bg-white p-7 shadow-sm ${
+                                        pkg.recommended
+                                            ? "border-[#21AA57] ring-2 ring-[#21AA57]/10"
+                                            : "border-gray-100"
+                                    }`}
+                                >
+                                    {pkg.recommended && (
+                                        <div className="absolute right-5 top-5 rounded-full bg-[#21AA57] px-3 py-1.5 text-[10px] font-black tracking-wider text-white uppercase">
+                                            Оптимальный старт
+                                        </div>
+                                    )}
+
+                                    <p className="mb-2 text-xs font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                                        {pkg.name}
+                                    </p>
+
+                                    <div className="mb-2 flex items-end gap-2">
+                                        <span className="text-4xl font-black tracking-tight text-[#29380E]">
+                                            {pkg.price}
+                                        </span>
+                                    </div>
+
+                                    <p className="mb-6 text-lg font-black text-[#29380E]/45">
+                                        {pkg.pv}
+                                    </p>
+
+                                    <div className="mb-6 grid grid-cols-2 gap-3">
+                                        <div className="rounded-2xl bg-[#F4F7F5] p-4">
+                                            <p className="mb-1 text-[10px] font-black tracking-wider text-[#29380E]/40 uppercase">
+                                                Ранг
+                                            </p>
+
+                                            <p className="text-sm font-black text-[#29380E]">
+                                                {pkg.rank}
+                                            </p>
+                                        </div>
+
+                                        <div className="rounded-2xl bg-[#F4F7F5] p-4">
+                                            <p className="mb-1 text-[10px] font-black tracking-wider text-[#29380E]/40 uppercase">
+                                                Бинар
+                                            </p>
+
+                                            <p className="text-sm font-black text-[#21AA57]">
+                                                {pkg.binary}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <p className="mb-6 text-sm leading-7 text-[#29380E]/55">
+                                        {pkg.description}
+                                    </p>
+
+                                    <div className="mb-8 flex-1 space-y-3">
+                                        {pkg.benefits.map(
+                                            (benefit) => (
+                                                <div
+                                                    key={
+                                                        benefit
+                                                    }
+                                                    className="flex items-start gap-3"
+                                                >
+                                                    <CheckCircle2
+                                                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#21AA57]"
+                                                        aria-hidden="true"
+                                                    />
+
+                                                    <span className="text-sm leading-6 text-[#29380E]/70">
+                                                        {
+                                                            benefit
+                                                        }
+                                                    </span>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+
+                                    <a
+                                        href={
+                                            KYRGYZSTAN_REGISTRATION_URL
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-black transition-transform hover:scale-[1.02] ${
+                                            pkg.recommended
+                                                ? "bg-[#21AA57] text-white"
+                                                : "bg-[#29380E] text-white"
+                                        }`}
+                                    >
+                                        Начать регистрацию
+
+                                        <ArrowRight
+                                            className="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    </a>
+                                </article>
+                            ),
+                        )}
+                    </div>
+
+                    {/* MARKETING DISCLAIMER */}
+
+                    <div className="mx-auto mt-8 max-w-5xl rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                        <p className="text-sm leading-7 text-amber-900/75">
+                            <strong>
+                                Важно:
+                            </strong>{" "}
+                            маркетинг-план, стоимость
+                            активации, PV, cashback, ранги,
+                            бонусы и правила начислений могут
+                            обновляться. Перед оплатой и
+                            активацией обязательно проверьте
+                            актуальные условия непосредственно
+                            в личном кабинете EnergyMax.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* ==================================
+                HOW TO START
+            ================================== */}
+
+            <section className="border-y border-gray-100 bg-white py-20">
+                <div className="container mx-auto px-4 md:px-6">
+                    <div className="mx-auto mb-12 max-w-3xl text-center">
+                        <p className="mb-3 text-xs font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                            Как начать
+                        </p>
+
+                        <h2 className="text-3xl font-black tracking-tight text-[#29380E] uppercase italic md:text-5xl">
+                            Регистрация
+                            <span className="text-[#21AA57]">
+                                {" "}
+                                по шагам
+                            </span>
+                        </h2>
+                    </div>
+
+                    <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
+                        {importantPoints.map(
+                            (item, index) => {
+                                const Icon = item.icon;
+
+                                return (
+                                    <article
+                                        key={item.title}
+                                        className="rounded-[2rem] bg-[#F4F7F5] p-6"
+                                    >
+                                        <div className="mb-5 flex items-center justify-between">
+                                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white">
+                                                <Icon
+                                                    className="h-5 w-5 text-[#21AA57]"
+                                                    aria-hidden="true"
+                                                />
+                                            </div>
+
+                                            <span className="text-3xl font-black text-[#29380E]/10">
+                                                {String(
+                                                    index + 1,
+                                                ).padStart(
+                                                    2,
+                                                    "0",
+                                                )}
+                                            </span>
+                                        </div>
+
+                                        <h3 className="mb-3 text-base font-black text-[#29380E]">
+                                            {item.title}
+                                        </h3>
+
+                                        <p className="text-sm leading-7 text-[#29380E]/55">
+                                            {item.text}
+                                        </p>
+                                    </article>
+                                );
+                            },
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            {/* ==================================
+                INCOME DISCLAIMER
+            ================================== */}
+
+            <section className="py-20">
+                <div className="container mx-auto px-4 md:px-6">
+                    <div className="mx-auto max-w-5xl rounded-[2.5rem] bg-[#29380E] p-8 text-white md:p-12">
+                        <div className="grid gap-8 lg:grid-cols-[auto_1fr]">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#21AA57]">
+                                <ShieldCheck
+                                    className="h-7 w-7"
+                                    aria-hidden="true"
+                                />
+                            </div>
+
+                            <div>
+                                <h2 className="mb-4 text-2xl font-black uppercase italic md:text-3xl">
+                                    Доход не гарантируется
+                                </h2>
+
+                                <div className="space-y-3 text-sm leading-7 text-white/65">
+                                    <p>
+                                        Бинарные проценты
+                                        являются элементами
+                                        маркетинг-плана и не
+                                        означают гарантированную
+                                        выплату от стоимости
+                                        пакета.
+                                    </p>
+
+                                    <p>
+                                        Фактические начисления
+                                        зависят от товарооборота,
+                                        структуры, квалификации,
+                                        активности и выполнения
+                                        действующих условий
+                                        программы.
+                                    </p>
+
+                                    <p>
+                                        Перед регистрацией
+                                        рекомендуем самостоятельно
+                                        ознакомиться с актуальными
+                                        правилами EnergyMax.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            {/* ==================================
+                CTA
+            ================================== */}
+
+            <section>
+                <div className="container mx-auto px-4 md:px-6">
+                    <div className="mx-auto max-w-6xl rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm md:p-12">
+                        <div className="grid gap-10 lg:grid-cols-2">
+                            {/* REGISTER */}
+
+                            <div>
+                                <Globe2
+                                    className="mb-5 h-9 w-9 text-[#21AA57]"
+                                    aria-hidden="true"
+                                />
+
+                                <h2 className="mb-4 text-2xl font-black tracking-tight text-[#29380E] uppercase">
+                                    Готовы зарегистрироваться?
+                                </h2>
+
+                                <p className="mb-6 text-sm leading-7 text-[#29380E]/60">
+                                    Перейдите в официальный
+                                    кабинет регистрации EnergyMax
+                                    по партнёрской ссылке.
+                                </p>
+
+                                <a
+                                    href={
+                                        KYRGYZSTAN_REGISTRATION_URL
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-[#21AA57] px-6 py-4 text-sm font-black text-white transition-transform hover:scale-[1.02]"
+                                >
+                                    Регистрация Кыргызстан
+
+                                    <ExternalLink
+                                        className="h-4 w-4"
+                                        aria-hidden="true"
+                                    />
+                                </a>
+                            </div>
+
+                            {/* QUESTIONS */}
+
+                            <div>
+                                <MessageCircle
+                                    className="mb-5 h-9 w-9 text-[#21AA57]"
+                                    aria-hidden="true"
+                                />
+
+                                <h2 className="mb-4 text-2xl font-black tracking-tight text-[#29380E] uppercase">
+                                    Остались вопросы?
+                                </h2>
+
+                                <p className="mb-6 text-sm leading-7 text-[#29380E]/60">
+                                    Можно написать в WhatsApp
+                                    перед регистрацией и уточнить
+                                    организационные вопросы.
+                                </p>
+
+                                <a
+                                    href={consultationUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-[#29380E] px-6 py-4 text-sm font-black text-white transition-transform hover:scale-[1.02]"
+                                >
+                                    Написать в WhatsApp
+
+                                    <ArrowRight
+                                        className="h-4 w-4"
+                                        aria-hidden="true"
+                                    />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ==================================
+                DOCUMENTS / LEGAL
+            ================================== */}
+
+            <section className="mt-12">
+                <div className="container mx-auto px-4 md:px-6">
+                    <div className="mx-auto max-w-5xl rounded-[2rem] bg-white p-7">
+                        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <div className="mb-3 flex items-center gap-2">
+                                    <FileText
+                                        className="h-5 w-5 text-[#21AA57]"
+                                        aria-hidden="true"
+                                    />
+
+                                    <h2 className="font-black text-[#29380E]">
+                                        Информация продавца
+                                    </h2>
+                                </div>
+
+                                <p className="text-sm leading-6 text-[#29380E]/55">
+                                    {seller.legalName}
+                                    <br />
+                                    {seller.sellerDescription}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-4 text-sm">
+                                <Link
+                                    href="/docs"
+                                    className="font-semibold text-[#21AA57] hover:underline"
+                                >
+                                    Документы
+                                </Link>
+
+                                <Link
+                                    href="/offer"
+                                    className="font-semibold text-[#21AA57] hover:underline"
+                                >
+                                    Публичная оферта
+                                </Link>
+
+                                <Link
+                                    href="/policy"
+                                    className="font-semibold text-[#21AA57] hover:underline"
+                                >
+                                    Конфиденциальность
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     );
 }

@@ -74,12 +74,12 @@ const staticPages = [
 const blogSlugs = [
     "microbiome",
     "bloating",
+    "stool",
     "immunity",
     "energy",
     "women",
     "kids",
 ] as const;
-
 // ==========================================
 // SITEMAP
 // ==========================================

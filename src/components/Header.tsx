@@ -1,423 +1,862 @@
 "use client";
 
 import { useState } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+
 import {
-    Grid,
+    BookOpen,
+    ChevronDown,
+    Dna,
+    FileText,
+    Grid2X2,
+    HeartPulse,
     Home,
-    Info,
-    Instagram,
     Menu,
     MessageCircle,
+    Microscope,
     Phone,
-    Send,
     ShoppingCart,
+    Sparkles,
     User,
     X,
 } from "lucide-react";
 
+import { useSession } from "next-auth/react";
+
 import { seller } from "@/config/seller";
-import { siteConfig } from "@/data/site";
 import { useCartStore } from "@/lib/store/cartStore";
 
+// ==========================================
+// DESKTOP DROPDOWNS
+// ==========================================
+
+const maxilinLinks = [
+    {
+        href: "/maxilin",
+        title: "О Максилине",
+        description:
+            "Один штамм 2585 — три формы",
+        icon: Sparkles,
+    },
+    {
+        href: "/product/maxilin-liquid",
+        title: "Жидкий Максилин",
+        description:
+            "Кисломолочная жидкая форма",
+        icon: HeartPulse,
+    },
+    {
+        href: "/product/maxilin-dry",
+        title: "Сухой Максилин",
+        description:
+            "Кисломолочная форма · 20 саше",
+        icon: Grid2X2,
+    },
+    {
+        href: "/maxilin/superprobiotic",
+        title: "Максилин Триллион",
+        description:
+            "SuperProbiotic · 50 саше",
+        icon: Sparkles,
+    },
+    {
+        href: "/maxilin/how-it-works",
+        title: "Как работает",
+        description:
+            "Пробиотик и пищеварительный тракт",
+        icon: BookOpen,
+    },
+    {
+        href: "/maxilin/science",
+        title: "Штамм 2585",
+        description:
+            "Наука, патент и документы",
+        icon: Microscope,
+    },
+    {
+        href: "/maxilin/gut-health",
+        title: "Кишечник и микробиом",
+        description:
+            "Микробиота, питание и пробиотики",
+        icon: HeartPulse,
+    },
+] as const;
+
+const arginineLinks = [
+    {
+        href: "/l-arginine",
+        title: "О L-Аргинине",
+        description:
+            "L-Arginine · аминокислота · NO",
+    },
+    {
+        href: "/product/l-arginine-tmin",
+        title: "L-Аргинин — Тмин",
+        description:
+            "Подъязычный формат",
+    },
+    {
+        href: "/product/l-arginine-tmin-gvozdika",
+        title: "Тмин + гвоздика",
+        description:
+            "L-Arginine EnergyMax",
+    },
+    {
+        href: "/product/l-arginine-gvozdika",
+        title: "L-Аргинин — Гвоздика",
+        description:
+            "Подъязычный формат",
+    },
+    {
+        href: "/product/l-arginine-myata",
+        title: "L-Аргинин — Мята",
+        description:
+            "Подъязычный формат",
+    },
+] as const;
+
+// ==========================================
+// HEADER
+// ==========================================
+
 export default function Header() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isContactOpen, setIsContactOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] =
+        useState(false);
 
-    const { data: session } = useSession();
+    const { data: session } =
+        useSession();
 
-    const totalItems = useCartStore((state) => state.getTotalItems());
+    const totalItems =
+        useCartStore(
+            (state) =>
+                state.getTotalItems(),
+        );
 
-    const instagramUrl = `https://instagram.com/${siteConfig.instagram.replace(
-        "@",
-        "",
-    )}`;
-
-    const telegramUrl = `https://t.me/${siteConfig.telegram.replace("@", "")}`;
+    const whatsappUrl =
+        `https://wa.me/${seller.whatsappPhone}?text=${encodeURIComponent(
+            "Здравствуйте! Хочу узнать подробнее о продукции.",
+        )}`;
 
     const closeMenu = () => {
         setIsMenuOpen(false);
-        setIsContactOpen(false);
-    };
-
-    const toggleMenu = () => {
-        setIsMenuOpen((currentValue) => !currentValue);
-    };
-
-    const toggleContacts = () => {
-        setIsContactOpen((currentValue) => !currentValue);
     };
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full border-b border-[#A8A496]/20 bg-white/95 shadow-sm backdrop-blur-md">
-                <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-12">
+            <header className="sticky top-0 z-50 w-full border-b border-[#A8A496]/20 bg-white/95 shadow-sm backdrop-blur-xl">
+                <div className="container mx-auto flex min-h-[70px] items-center justify-between gap-4 px-4 md:px-6 lg:px-8">
+                    {/* ==================================
+                        LOGO
+                    ================================== */}
+
                     <Link
                         href="/"
-                        aria-label={`Перейти на главную страницу ${seller.siteName}`}
-                        className="z-50 flex items-center"
+                        aria-label="probiotic.kg — главная"
+                        className="relative z-50 flex flex-shrink-0 items-center gap-2"
+                        onClick={closeMenu}
                     >
-                        <div>
-                            <Image
-                                src="/images/logo-main.webp"
-                                alt={`${seller.siteName} — продукция EnergyMax`}
-                                width={130}
-                                height={32}
-                                priority
-                                className="object-contain"
-                            />
+                        <Image
+                            src="/images/logo-main.webp"
+                            alt="probiotic.kg — Максилин и продукция EnergyMax"
+                            width={130}
+                            height={36}
+                            priority
+                            className="h-auto w-[115px] object-contain lg:w-[130px]"
+                        />
 
-                            <span className="mt-1.5 block w-[130px] text-center text-[9px] font-bold tracking-[0.55em] text-[#A8A496] uppercase">
-                                GROUP
-                            </span>
-                        </div>
+                        {/*
+                         * Здесь НЕ используем h1.
+                         *
+                         * H1 должен быть уникальным
+                         * заголовком конкретной страницы,
+                         * а не повторяться внутри Header
+                         * на всём сайте.
+                         */}
+                        <span className="hidden text-[9px] font-black tracking-[0.18em] text-[#29380E]/35 uppercase xl:inline">
+                            Кыргызстан
+                        </span>
                     </Link>
 
-                    {/* Навигация на компьютере */}
+                    {/* ==================================
+                        DESKTOP NAVIGATION
+                    ================================== */}
+
                     <nav
                         aria-label="Основная навигация"
-                        className="hidden items-center gap-6 text-[13px] font-bold tracking-wide text-[#29380E]/90 uppercase md:flex"
+                        className="hidden items-center gap-1 lg:flex"
                     >
+                        {/* MAXILIN */}
+
+                        <div className="group relative">
+                            <Link
+                                href="/maxilin"
+                                className="flex items-center gap-1 rounded-xl px-3 py-3 text-[12px] font-black tracking-wide text-[#29380E] uppercase transition hover:bg-[#F4F7F5] hover:text-[#21AA57]"
+                            >
+                                Максилин
+
+                                <ChevronDown
+                                    className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180"
+                                    aria-hidden="true"
+                                />
+                            </Link>
+
+                            <div className="pointer-events-none absolute left-0 top-full w-[390px] translate-y-2 pt-2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                                <div className="rounded-[1.75rem] border border-gray-100 bg-white p-3 shadow-2xl shadow-black/10">
+                                    <div className="mb-2 px-3 py-2">
+                                        <p className="text-[9px] font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                                            Максилин
+                                        </p>
+
+                                        <p className="mt-1 text-xs text-[#29380E]/45">
+                                            Пробиотики ·
+                                            Lactobacillus
+                                            acidophilus 2585
+                                        </p>
+                                    </div>
+
+                                    <div className="grid gap-1">
+                                        {maxilinLinks.map(
+                                            ({
+                                                 href,
+                                                 title,
+                                                 description,
+                                                 icon: Icon,
+                                             }) => (
+                                                <Link
+                                                    key={
+                                                        href
+                                                    }
+                                                    href={
+                                                        href
+                                                    }
+                                                    className="flex items-start gap-3 rounded-xl px-3 py-3 transition hover:bg-[#F4F7F5]"
+                                                >
+                                                    <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-[#21AA57]/10">
+                                                        <Icon
+                                                            className="h-4 w-4 text-[#21AA57]"
+                                                            aria-hidden="true"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-xs font-black text-[#29380E]">
+                                                            {
+                                                                title
+                                                            }
+                                                        </p>
+
+                                                        <p className="mt-1 text-[10px] leading-4 text-[#29380E]/45">
+                                                            {
+                                                                description
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                </Link>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* L-ARGININE */}
+
+                        <div className="group relative">
+                            <Link
+                                href="/l-arginine"
+                                className="flex items-center gap-1 rounded-xl px-3 py-3 text-[12px] font-black tracking-wide text-[#29380E] uppercase transition hover:bg-[#F4F7F5] hover:text-[#21AA57]"
+                            >
+                                L-Аргинин
+
+                                <ChevronDown
+                                    className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180"
+                                    aria-hidden="true"
+                                />
+                            </Link>
+
+                            <div className="pointer-events-none absolute left-0 top-full w-[350px] translate-y-2 pt-2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                                <div className="rounded-[1.75rem] border border-gray-100 bg-white p-3 shadow-2xl shadow-black/10">
+                                    <div className="mb-2 px-3 py-2">
+                                        <div className="flex items-center gap-2">
+                                            <Dna
+                                                className="h-4 w-4 text-[#21AA57]"
+                                                aria-hidden="true"
+                                            />
+
+                                            <p className="text-[9px] font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                                                L-Arginine
+                                            </p>
+                                        </div>
+
+                                        <p className="mt-2 text-xs text-[#29380E]/45">
+                                            Аминокислота ·
+                                            оксид азота NO ·
+                                            EnergyMax
+                                        </p>
+                                    </div>
+
+                                    <div className="grid gap-1">
+                                        {arginineLinks.map(
+                                            ({
+                                                 href,
+                                                 title,
+                                                 description,
+                                             }) => (
+                                                <Link
+                                                    key={
+                                                        href
+                                                    }
+                                                    href={
+                                                        href
+                                                    }
+                                                    className="rounded-xl px-3 py-3 transition hover:bg-[#F4F7F5]"
+                                                >
+                                                    <p className="text-xs font-black text-[#29380E]">
+                                                        {
+                                                            title
+                                                        }
+                                                    </p>
+
+                                                    <p className="mt-1 text-[10px] text-[#29380E]/45">
+                                                        {
+                                                            description
+                                                        }
+                                                    </p>
+                                                </Link>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* GUT HEALTH */}
+
                         <Link
-                            href="/about"
-                            className="transition-colors hover:text-[#21AA57]"
+                            href="/maxilin/gut-health"
+                            className="rounded-xl px-3 py-3 text-[12px] font-black tracking-wide text-[#29380E] uppercase transition hover:bg-[#F4F7F5] hover:text-[#21AA57]"
                         >
-                            О компании
+                            Кишечник
                         </Link>
+
+                        {/* CATALOG */}
 
                         <Link
                             href="/#catalog"
-                            className="transition-colors hover:text-[#21AA57]"
+                            className="rounded-xl px-3 py-3 text-[12px] font-black tracking-wide text-[#29380E] uppercase transition hover:bg-[#F4F7F5] hover:text-[#21AA57]"
                         >
                             Каталог
                         </Link>
 
-                        <Link
-                            href="/info"
-                            className="transition-colors hover:text-[#21AA57]"
-                        >
-                            База знаний
-                        </Link>
+                        {/* DOCUMENTS */}
 
                         <Link
-                            href="/business"
-                            className="transition-colors hover:text-[#21AA57]"
+                            href="/docs"
+                            className="rounded-xl px-3 py-3 text-[12px] font-black tracking-wide text-[#29380E] uppercase transition hover:bg-[#F4F7F5] hover:text-[#21AA57]"
                         >
-                            Бизнес
-                        </Link>
-
-                        <Link
-                            href="/mentorship"
-                            className="whitespace-nowrap transition-colors hover:text-[#21AA57]"
-                        >
-                            Наставничество
+                            Документы
                         </Link>
                     </nav>
 
-                    {/* Контакты и корзина на компьютере */}
-                    <div className="hidden items-center gap-5 md:flex">
+                    {/* ==================================
+                        DESKTOP ACTIONS
+                    ================================== */}
+
+                    <div className="hidden items-center gap-2 md:flex">
                         <a
                             href={`tel:${seller.phoneHref}`}
-                            aria-label={`Позвонить по номеру ${seller.phone}`}
-                            className="flex items-center gap-2 font-black text-[#29380E] transition-all hover:text-[#21AA57]"
+                            aria-label={`Позвонить ${seller.phone}`}
+                            className="hidden items-center gap-2 rounded-xl px-3 py-2 font-black text-[#29380E] transition hover:bg-[#F4F7F5] hover:text-[#21AA57] xl:flex"
                         >
                             <Phone
                                 className="h-4 w-4 text-[#21AA57]"
                                 aria-hidden="true"
                             />
 
-                            <span className="text-sm">{seller.phone}</span>
+                            <span className="text-xs">
+                                {
+                                    seller.phone
+                                }
+                            </span>
+                        </a>
+
+                        <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Написать в WhatsApp"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#21AA57]/10 transition hover:bg-[#21AA57] hover:text-white"
+                        >
+                            <MessageCircle
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                            />
                         </a>
 
                         <Link
                             href="/cart"
-                            aria-label={`Открыть корзину. Товаров: ${totalItems}`}
-                            className="relative rounded-full bg-[#F4F7F5] p-2 transition-colors hover:bg-[#21AA57]/10"
+                            aria-label={`Корзина, товаров: ${totalItems}`}
+                            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#F4F7F5] transition hover:bg-[#21AA57]/10"
                         >
                             <ShoppingCart
                                 className="h-5 w-5 text-[#29380E]"
                                 aria-hidden="true"
                             />
 
-                            {totalItems > 0 && (
-                                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#D4AF37] text-[10px] font-bold text-white shadow-sm">
-                                    {totalItems}
+                            {totalItems >
+                                0 && (
+                                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#D4AF37] px-1 text-[9px] font-black text-white">
+                                    {
+                                        totalItems
+                                    }
                                 </span>
-                            )}
+                                )}
                         </Link>
 
                         {session ? (
                             <Link
                                 href="/dashboard"
-                                className="flex items-center gap-2 rounded-full bg-[#21AA57] px-4 py-2 font-bold text-white transition-colors hover:bg-[#1d914a]"
+                                className="hidden items-center gap-2 rounded-full bg-[#21AA57] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#1d914a] xl:flex"
                             >
                                 <User
                                     className="h-4 w-4"
                                     aria-hidden="true"
                                 />
 
-                                <span className="text-sm">
-                                    Личный кабинет
-                                </span>
+                                Кабинет
                             </Link>
                         ) : (
                             <Link
                                 href="/auth/login"
-                                className="flex items-center gap-2 rounded-full bg-[#F4F7F5] px-4 py-2 font-bold text-[#29380E] transition-colors hover:bg-[#21AA57] hover:text-white"
+                                className="hidden items-center gap-2 rounded-full bg-[#F4F7F5] px-4 py-2.5 text-xs font-black text-[#29380E] transition hover:bg-[#21AA57] hover:text-white xl:flex"
                             >
                                 <User
                                     className="h-4 w-4"
                                     aria-hidden="true"
                                 />
 
-                                <span className="text-sm">Войти</span>
+                                Войти
                             </Link>
                         )}
                     </div>
 
-                    {/* Кнопка мобильного меню */}
+                    {/* ==================================
+                        MOBILE BUTTON
+                    ================================== */}
+
                     <button
                         type="button"
-                        onClick={toggleMenu}
                         aria-label={
                             isMenuOpen
-                                ? "Закрыть главное меню"
-                                : "Открыть главное меню"
+                                ? "Закрыть меню"
+                                : "Открыть меню"
                         }
-                        aria-expanded={isMenuOpen}
-                        aria-controls="mobile-main-menu"
-                        className="p-2 text-[#29380E] md:hidden"
+                        aria-expanded={
+                            isMenuOpen
+                        }
+                        onClick={() =>
+                            setIsMenuOpen(
+                                (value) =>
+                                    !value,
+                            )
+                        }
+                        className="relative z-50 flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F7F5] text-[#29380E] md:hidden"
                     >
                         {isMenuOpen ? (
-                            <X className="h-6 w-6" aria-hidden="true" />
+                            <X
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                            />
                         ) : (
-                            <Menu className="h-6 w-6" aria-hidden="true" />
+                            <Menu
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                            />
                         )}
                     </button>
                 </div>
 
-                <AnimatePresence>
-                    {isMenuOpen && (
-                        <motion.nav
-                            id="mobile-main-menu"
+                {/* ==================================
+                    MOBILE MENU
+                ================================== */}
+
+                {isMenuOpen && (
+                    <div className="absolute left-0 top-full max-h-[calc(100vh-70px)] w-full overflow-y-auto border-t border-gray-100 bg-white px-4 pb-28 pt-5 shadow-xl md:hidden">
+                        <nav
                             aria-label="Мобильная навигация"
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="absolute top-full left-0 flex w-full flex-col gap-5 border-b border-gray-100 bg-white px-8 py-6 font-bold text-[#29380E] shadow-xl md:hidden"
+                            className="container mx-auto"
                         >
-                            <Link href="/about" onClick={closeMenu}>
-                                О компании
-                            </Link>
+                            {/* MAIN SEO LINKS */}
 
-                            <Link href="/#catalog" onClick={closeMenu}>
-                                Каталог
-                            </Link>
-
-                            <Link href="/info" onClick={closeMenu}>
-                                База знаний
-                            </Link>
-
-                            <Link href="/business" onClick={closeMenu}>
-                                Бизнес
-                            </Link>
-
-                            <Link href="/mentorship" onClick={closeMenu}>
-                                Наставничество
-                            </Link>
-
-                            <a
-                                href={`tel:${seller.phoneHref}`}
-                                onClick={closeMenu}
-                                className="flex items-center gap-2 text-[#21AA57]"
-                            >
-                                <Phone
-                                    className="h-4 w-4"
-                                    aria-hidden="true"
+                            <div className="grid gap-2">
+                                <MobileMainLink
+                                    href="/maxilin"
+                                    icon={
+                                        Sparkles
+                                    }
+                                    title="Максилин"
+                                    subtitle="Три формы · штамм 2585"
+                                    onClick={
+                                        closeMenu
+                                    }
                                 />
 
-                                {seller.phone}
-                            </a>
-                        </motion.nav>
-                    )}
-                </AnimatePresence>
-            </header>
+                                <MobileMainLink
+                                    href="/l-arginine"
+                                    icon={Dna}
+                                    title="L-Аргинин"
+                                    subtitle="L-Arginine · аминокислота · NO"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                />
 
-            {/* Нижняя панель на телефоне */}
-            <nav
-                aria-label="Мобильная панель навигации"
-                className="pb-safe-area-inset-bottom fixed right-0 bottom-0 left-0 z-[60] border-t border-gray-200 bg-white/95 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] backdrop-blur-lg md:hidden"
-            >
-                <div className="flex items-center justify-around px-2 py-3 text-[#A8A496]">
-                    <Link
-                        href="/"
-                        className="flex flex-col items-center gap-1 active:text-[#21AA57]"
-                    >
-                        <Home className="h-6 w-6" aria-hidden="true" />
+                                <MobileMainLink
+                                    href="/maxilin/gut-health"
+                                    icon={
+                                        HeartPulse
+                                    }
+                                    title="Кишечник и микробиом"
+                                    subtitle="Микробиота · питание · пробиотики"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                />
 
-                        <span className="text-[10px] font-bold tracking-tighter uppercase">
-                            Главная
-                        </span>
-                    </Link>
+                                <MobileMainLink
+                                    href="/#catalog"
+                                    icon={
+                                        Grid2X2
+                                    }
+                                    title="Каталог"
+                                    subtitle="Все товары EnergyMax"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                />
+                            </div>
 
-                    <Link
-                        href="/#catalog"
-                        className="flex flex-col items-center gap-1 active:text-[#21AA57]"
-                    >
-                        <Grid className="h-6 w-6" aria-hidden="true" />
+                            {/* MAXILIN LINKS */}
 
-                        <span className="text-[10px] font-bold tracking-tighter uppercase">
-                            Каталог
-                        </span>
-                    </Link>
+                            <div className="mt-7">
+                                <p className="px-2 text-[9px] font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                                    Максилин
+                                </p>
 
-                    <button
-                        type="button"
-                        onClick={toggleContacts}
-                        aria-label={
-                            isContactOpen
-                                ? "Закрыть способы связи"
-                                : "Открыть способы связи"
-                        }
-                        aria-expanded={isContactOpen}
-                        aria-controls="mobile-contact-panel"
-                        className="relative -mt-10 flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#F4F7F5] bg-[#21AA57] shadow-lg shadow-[#21AA57]/40 transition-transform active:scale-90"
-                    >
-                        <MessageCircle
-                            className="h-7 w-7 text-white"
-                            aria-hidden="true"
-                        />
-                    </button>
+                                <div className="mt-2 grid grid-cols-2 gap-2">
+                                    <MobileSmallLink
+                                        href="/product/maxilin-liquid"
+                                        title="Жидкий"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
 
-                    <Link
-                        href="/cart"
-                        aria-label={`Открыть корзину. Товаров: ${totalItems}`}
-                        className="relative flex flex-col items-center gap-1 active:text-[#21AA57]"
-                    >
-                        <ShoppingCart
-                            className="h-6 w-6"
-                            aria-hidden="true"
-                        />
+                                    <MobileSmallLink
+                                        href="/product/maxilin-dry"
+                                        title="Сухой"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
 
-                        {totalItems > 0 && (
-                            <span className="absolute -top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4AF37] text-[9px] font-bold text-white">
-                                {totalItems}
-                            </span>
-                        )}
+                                    <MobileSmallLink
+                                        href="/maxilin/superprobiotic"
+                                        title="Триллион"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
 
-                        <span className="text-[10px] font-bold tracking-tighter uppercase">
-                            Корзина
-                        </span>
-                    </Link>
+                                    <MobileSmallLink
+                                        href="/maxilin/science"
+                                        title="Штамм 2585"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
 
-                    <Link
-                        href="/info"
-                        className="flex flex-col items-center gap-1 active:text-[#21AA57]"
-                    >
-                        <Info className="h-6 w-6" aria-hidden="true" />
+                                    <MobileSmallLink
+                                        href="/maxilin/how-it-works"
+                                        title="Как работает"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
 
-                        <span className="text-[10px] font-bold tracking-tighter uppercase">
-                            Инфо
-                        </span>
-                    </Link>
-                </div>
-            </nav>
+                                    <MobileSmallLink
+                                        href="/docs"
+                                        title="Документы"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
+                                </div>
+                            </div>
 
-            {/* Панель контактов */}
-            <AnimatePresence>
-                {isContactOpen && (
-                    <>
-                        <motion.button
-                            type="button"
-                            aria-label="Закрыть панель контактов"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsContactOpen(false)}
-                            className="fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm md:hidden"
-                        />
+                            {/* ADDITIONAL */}
 
-                        <motion.div
-                            id="mobile-contact-panel"
-                            initial={{ y: "100%" }}
-                            animate={{ y: 0 }}
-                            exit={{ y: "100%" }}
-                            className="fixed right-4 bottom-24 left-4 z-[70] rounded-[2.5rem] bg-white p-6 shadow-2xl md:hidden"
-                        >
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="mt-7 border-t border-gray-100 pt-5">
+                                <p className="px-2 text-[9px] font-black tracking-[0.2em] text-[#29380E]/35 uppercase">
+                                    Дополнительно
+                                </p>
+
+                                <div className="mt-3 grid gap-1">
+                                    <MobileTextLink
+                                        href="/about"
+                                        title="О компании"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
+
+                                    <MobileTextLink
+                                        href="/faq"
+                                        title="Вопросы и ответы"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
+
+                                    <MobileTextLink
+                                        href="/blog"
+                                        title="Полезные материалы"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
+
+                                    <MobileTextLink
+                                        href="/business"
+                                        title="Партнёрство EnergyMax"
+                                        onClick={
+                                            closeMenu
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            {/* CONTACT */}
+
+                            <div className="mt-7 grid gap-3">
                                 <a
-                                    href={`https://wa.me/${seller.whatsappPhone}`}
+                                    href={
+                                        whatsappUrl
+                                    }
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex flex-col items-center gap-3 rounded-3xl border border-[#21AA57]/10 bg-[#21AA57]/5 p-5 transition-transform active:scale-95"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                    className="flex items-center justify-center gap-2 rounded-2xl bg-[#21AA57] px-5 py-4 text-sm font-black text-white"
                                 >
                                     <MessageCircle
-                                        className="h-8 w-8 text-[#21AA57]"
+                                        className="h-5 w-5"
                                         aria-hidden="true"
                                     />
 
-                                    <span className="text-xs font-bold text-[#29380E]">
-                                        WhatsApp
-                                    </span>
-                                </a>
-
-                                <a
-                                    href={telegramUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex flex-col items-center gap-3 rounded-3xl border border-[#0088cc]/10 bg-[#0088cc]/5 p-5 transition-transform active:scale-95"
-                                >
-                                    <Send
-                                        className="h-8 w-8 text-[#0088cc]"
-                                        aria-hidden="true"
-                                    />
-
-                                    <span className="text-xs font-bold text-[#29380E]">
-                                        Telegram
-                                    </span>
-                                </a>
-
-                                <a
-                                    href={instagramUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex flex-col items-center gap-3 rounded-3xl border border-[#e1306c]/10 bg-[#e1306c]/5 p-5 transition-transform active:scale-95"
-                                >
-                                    <Instagram
-                                        className="h-8 w-8 text-[#e1306c]"
-                                        aria-hidden="true"
-                                    />
-
-                                    <span className="text-xs font-bold text-[#29380E]">
-                                        Instagram
-                                    </span>
+                                    Написать
+                                    в WhatsApp
                                 </a>
 
                                 <a
                                     href={`tel:${seller.phoneHref}`}
-                                    className="flex flex-col items-center gap-3 rounded-3xl border border-[#29380E]/10 bg-[#29380E]/5 p-5 transition-transform active:scale-95"
+                                    className="flex items-center justify-center gap-2 rounded-2xl bg-[#F4F7F5] px-5 py-4 text-sm font-black text-[#29380E]"
                                 >
                                     <Phone
-                                        className="h-8 w-8 text-[#29380E]"
+                                        className="h-4 w-4 text-[#21AA57]"
                                         aria-hidden="true"
                                     />
 
-                                    <span className="text-xs font-bold text-[#29380E]">
-                                        Позвонить
-                                    </span>
+                                    {
+                                        seller.phone
+                                    }
                                 </a>
                             </div>
-
-                            <p className="mt-5 text-center text-xs text-gray-500">
-                                Телефон продавца: {seller.phone}
-                            </p>
-                        </motion.div>
-                    </>
+                        </nav>
+                    </div>
                 )}
-            </AnimatePresence>
+            </header>
+
+            {/* ==================================
+                MOBILE BOTTOM NAVIGATION
+            ================================== */}
+
+            <nav
+                aria-label="Быстрая навигация"
+                className="fixed bottom-0 left-0 right-0 z-[60] grid grid-cols-4 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-5px_20px_rgba(0,0,0,0.06)] backdrop-blur-xl md:hidden"
+            >
+                <BottomLink
+                    href="/"
+                    icon={Home}
+                    label="Главная"
+                />
+
+                <BottomLink
+                    href="/#catalog"
+                    icon={Grid2X2}
+                    label="Каталог"
+                />
+
+                <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-[62px] flex-col items-center justify-center gap-1 text-[#21AA57]"
+                >
+                    <MessageCircle
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                    />
+
+                    <span className="text-[9px] font-black uppercase">
+                        WhatsApp
+                    </span>
+                </a>
+
+                <Link
+                    href="/cart"
+                    className="relative flex min-h-[62px] flex-col items-center justify-center gap-1 text-[#29380E]"
+                >
+                    <ShoppingCart
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                    />
+
+                    <span className="text-[9px] font-black uppercase">
+                        Корзина
+                    </span>
+
+                    {totalItems > 0 && (
+                        <span className="absolute right-[calc(50%-20px)] top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#D4AF37] px-1 text-[8px] font-black text-white">
+                            {totalItems}
+                        </span>
+                    )}
+                </Link>
+            </nav>
         </>
+    );
+}
+
+// ==========================================
+// MOBILE MAIN LINK
+// ==========================================
+
+function MobileMainLink({
+                            href,
+                            icon: Icon,
+                            title,
+                            subtitle,
+                            onClick,
+                        }: {
+    href: string;
+    icon: typeof Sparkles;
+    title: string;
+    subtitle: string;
+    onClick: () => void;
+}) {
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className="flex items-center gap-4 rounded-2xl bg-[#F4F7F5] p-4"
+        >
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#21AA57]/10">
+                <Icon
+                    className="h-5 w-5 text-[#21AA57]"
+                    aria-hidden="true"
+                />
+            </div>
+
+            <div>
+                <p className="text-sm font-black text-[#29380E]">
+                    {title}
+                </p>
+
+                <p className="mt-1 text-[10px] leading-4 text-[#29380E]/45">
+                    {subtitle}
+                </p>
+            </div>
+        </Link>
+    );
+}
+
+// ==========================================
+// MOBILE SMALL LINK
+// ==========================================
+
+function MobileSmallLink({
+                             href,
+                             title,
+                             onClick,
+                         }: {
+    href: string;
+    title: string;
+    onClick: () => void;
+}) {
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className="rounded-xl bg-[#F4F7F5] px-4 py-3 text-xs font-black text-[#29380E]"
+        >
+            {title}
+        </Link>
+    );
+}
+
+// ==========================================
+// MOBILE TEXT LINK
+// ==========================================
+
+function MobileTextLink({
+                            href,
+                            title,
+                            onClick,
+                        }: {
+    href: string;
+    title: string;
+    onClick: () => void;
+}) {
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className="rounded-xl px-2 py-2.5 text-sm font-bold text-[#29380E]/70"
+        >
+            {title}
+        </Link>
+    );
+}
+
+// ==========================================
+// BOTTOM LINK
+// ==========================================
+
+function BottomLink({
+                        href,
+                        icon: Icon,
+                        label,
+                    }: {
+    href: string;
+    icon: typeof Home;
+    label: string;
+}) {
+    return (
+        <Link
+            href={href}
+            className="flex min-h-[62px] flex-col items-center justify-center gap-1 text-[#29380E]"
+        >
+            <Icon
+                className="h-5 w-5"
+                aria-hidden="true"
+            />
+
+            <span className="text-[9px] font-black uppercase">
+                {label}
+            </span>
+        </Link>
     );
 }

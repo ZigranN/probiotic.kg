@@ -7,7 +7,11 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-// --- ПОЛЬЗОВАТЕЛИ И РОЛИ ---
+
+// ==========================================
+// ПОЛЬЗОВАТЕЛИ И РОЛИ
+// ==========================================
+
 enum Role {
   USER
   ADMIN
@@ -19,22 +23,25 @@ model User {
   lastName      String?
   phone         String?   @unique
   email         String?   @unique
-  passwordHash  String?   // Может быть null для OAuth
+  passwordHash  String?
   emailVerified DateTime?
   image         String?
   role          Role      @default(USER)
 
-  orders        Order[]
-  accounts      Account[]
-  sessions      Session[]
-  addresses     Address[]
-  reviews       Review[]
+  orders    Order[]
+  accounts  Account[]
+  sessions  Session[]
+  addresses Address[]
+  reviews   Review[]
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// NextAuth OAuth accounts
+// ==========================================
+// NEXTAUTH
+// ==========================================
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -52,6 +59,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -59,7 +67,10 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -70,26 +81,36 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Адреса доставки пользователя
+// ==========================================
+// АДРЕСА
+// ==========================================
+
 model Address {
-  id         String  @id @default(uuid())
-  userId     String
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  userId String
 
-  label      String? // "Дом", "Работа"
-  city       String
-  street     String
-  building   String
-  apartment  String?
-  entrance   String?
-  floor      String?
-  isDefault  Boolean @default(false)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  label     String?
+  city      String
+  street    String
+  building  String
+  apartment String?
+  entrance  String?
+  floor     String?
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
-// --- КАТАЛОГ И ТОВАРЫ ---
+// ==========================================
+// КАТАЛОГ
+// ==========================================
+
 enum Category {
   PROBIOTIC
   CANDLES
@@ -97,58 +118,127 @@ enum Category {
 }
 
 model Product {
-  id            String   @id @default(uuid())
-  slug          String   @unique
-  name          String
-  category      Category
+  id       String   @id @default(uuid())
+  slug     String   @unique
+  name     String
+  category Category
 
-  heroTag       String?
-  form          String?
-  packInfo      String?
-  description   String   @db.Text
+  // ------------------------------------------
+  // ОСНОВНЫЕ ДАННЫЕ
+  // ------------------------------------------
 
-  // Для скидок: старая цена зачеркивается, если она больше priceKgs
-  oldPriceKgs   Int?
-  priceKgs      Int
+  heroTag     String?
+  subtitle    String?
+  form        String?
+  packInfo    String?
+  description String  @db.Text
 
-  inStock       Boolean  @default(true) // Наличие товара
+  // ------------------------------------------
+  // КОНТЕНТ КАРТОЧКИ
+  // ------------------------------------------
 
-  // Массивы строк храним в формате JSON (особенности Prisma)
-  shortBenefits Json     // string[]
-  forWhom       Json?    // string[]
-  keyNotes      Json?    // string[]
-  howToUse      Json?    // string[]
-  cautions      Json?    // string[]
-  storage       Json?    // string[]
-  images        Json     // { src: string, alt: string }[]
+  composition String? @db.Text
+  dosageNote  String? @db.Text
 
-  orderItems    OrderItem[]
-  reviews       Review[]
+  shortBenefits Json
+  forWhom       Json?
+  keyNotes      Json?
+  features      Json?
+  howToUse      Json?
+  cautions      Json?
+  storage       Json?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  // ------------------------------------------
+  // UI / FAQ
+  // ------------------------------------------
+
+  badges Json?
+  tags   Json?
+  faq    Json?
+
+  // ------------------------------------------
+  // ИЗОБРАЖЕНИЯ
+  // ------------------------------------------
+
+  images  Json
+  imageBg String?
+
+  // ------------------------------------------
+  // ЦЕНЫ И НАЛИЧИЕ
+  // ------------------------------------------
+
+  oldPriceKgs Int?
+  priceKgs    Int
+
+  inStock Boolean @default(true)
+
+  // ------------------------------------------
+  // ВАРИАНТЫ
+  // ------------------------------------------
+
+  variants Json?
+
+  // ------------------------------------------
+  // СВЯЗАННЫЕ ТОВАРЫ
+  // ------------------------------------------
+
+  relatedSlugs Json?
+
+  // ------------------------------------------
+  // SEO
+  // ------------------------------------------
+
+  seoTitle       String?
+  seoDescription String? @db.Text
+
+  // ------------------------------------------
+  // RELATIONS
+  // ------------------------------------------
+
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([inStock])
 }
 
-// Отзывы на товары
+// ==========================================
+// ОТЗЫВЫ
+// ==========================================
+
 model Review {
-  id         String   @id @default(uuid())
-  productId  String
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id        String @id @default(uuid())
+  productId String
 
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  name       String   // Имя (если гость) или имя пользователя
-  rating     Int      // 1-5 звезд
-  text       String   @db.Text
-  images     Json?    // массив URL изображений (опционально)
+  userId String?
 
-  isApproved Boolean  @default(true) // Автопубликация
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  name   String
+  rating Int
+  text   String @db.Text
+
+  images Json?
+
+  isApproved Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@index([isApproved])
 }
 
-// --- ЗАКАЗЫ (КОРЗИНА) ---
+// ==========================================
+// ЗАКАЗЫ
+// ==========================================
+
 enum OrderStatus {
   PENDING
   PROCESSING
@@ -158,68 +248,110 @@ enum OrderStatus {
 }
 
 model Order {
-  id             String      @id @default(cuid())
-  createdAt      DateTime    @default(now())
-  customerName   String
-  customerPhone  String
-  customerEmail  String?
-  status         OrderStatus @default(PENDING)
-  totalPrice     Float
+  id            String  @id @default(cuid())
+  customerName  String
+  customerPhone String
+  customerEmail String?
 
-  // Адрес доставки
-  city           String?
-  street         String?
-  building       String?
-  apartment      String?
-  deliveryNotes  String?
+  status     OrderStatus @default(PENDING)
+  totalPrice Float
 
-  // Реквизиты оплаты (WhatsApp сообщение)
-  paymentDetails String?     @db.Text
+  // ------------------------------------------
+  // ДОСТАВКА
+  // ------------------------------------------
 
-  items          OrderItem[]
-  userId         String?
-  user           User?       @relation(fields: [userId], references: [id])
+  city          String?
+  street        String?
+  building      String?
+  apartment     String?
+  deliveryNotes String?
 
-  updatedAt      DateTime    @updatedAt
+  // ------------------------------------------
+  // ОПЛАТА
+  // ------------------------------------------
+
+  paymentDetails String? @db.Text
+
+  // ------------------------------------------
+  // RELATIONS
+  // ------------------------------------------
+
+  items OrderItem[]
+
+  userId String?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
-// Добавь в модель OrderItem поле productId для связи с Product
+// ==========================================
+// ПОЗИЦИИ ЗАКАЗА
+// ==========================================
+
 model OrderItem {
-  id          String  @id @default(cuid())
-  orderId     String
-  order       Order   @relation(fields: [orderId], references: [id])
+  id      String @id @default(cuid())
+  orderId String
 
-  // ДОБАВЬ ЭТИ ТРИ СТРОКИ:
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
   productSlug String
-  product     Product @relation(fields: [productSlug], references: [slug])
 
-  name        String
-  price       Float
-  quantity    Int
+  product Product @relation(fields: [productSlug], references: [slug], onUpdate: Cascade, onDelete: Restrict)
+
+  // Snapshot товара на момент покупки
+  name     String
+  price    Float
+  quantity Int
+
+  @@index([orderId])
+  @@index([productSlug])
 }
 
-// --- ЗАЯВКИ НА ПАРТНЕРСТВО (МАРКЕТИНГ) ---
+// ==========================================
+// ЗАЯВКИ НА ПАРТНЕРСТВО
+// ==========================================
+
 model PartnershipLead {
-  id             String   @id @default(uuid())
-  name           String
-  phone          String
-  email          String?
-  desiredPackage String?  // Small, Medium, Big, VIP (если выбрал на сайте)
-  isProcessed    Boolean  @default(false) // Статус для админки: обработана ли заявка
+  id    String  @id @default(uuid())
+  name  String
+  phone String
+  email String?
 
-  createdAt      DateTime @default(now())
+  desiredPackage String?
+
+  isProcessed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([isProcessed])
+  @@index([createdAt])
 }
 
-// --- ИНФОРМАЦИОННЫЙ БЛОК (БЛОГ / МИКРОБИОМ) ---
-model Article {
-  id         String   @id @default(uuid())
-  slug       String   @unique
-  title      String
-  topic      String   // 'Кожа', 'Кишечник', 'Мозг', 'Аутизм'
-  content    String   @db.Text
-  youtubeUrl String?  // Ссылка на видео для iframe
-  imageUrl   String?  // Обложка статьи
+// ==========================================
+// БЛОГ / БАЗА ЗНАНИЙ
+// ==========================================
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model Article {
+  id    String @id @default(uuid())
+  slug  String @unique
+  title String
+
+  topic String
+
+  content String @db.Text
+
+  youtubeUrl String?
+  imageUrl   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topic])
+  @@index([createdAt])
 }

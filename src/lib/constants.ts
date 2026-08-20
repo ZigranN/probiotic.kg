@@ -1,24 +1,66 @@
-// Глобальные константы приложения
+import { seller } from "@/config/seller";
 
-export const WHATSAPP_PHONE = "996990105555";
-export const FREE_DELIVERY_FROM_KGS = 5600;
-export const SUPPORT_EMAIL = "fullstacknargiz@gmail.com";
-export const SITE_NAME = "EnergyMax";
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// ==========================================
+// GLOBAL APP CONSTANTS
+// ==========================================
+//
+// Юридические данные, контакты и адрес
+// НЕ дублируем здесь вручную.
+// Единый источник истины:
+// src/config/seller.ts
+// ==========================================
 
-// Контакты
+export const SITE_NAME = seller.siteName;
+export const SITE_URL = seller.siteUrl;
+
+export const WHATSAPP_PHONE = seller.whatsappPhone;
+export const SUPPORT_EMAIL = seller.email;
+
+// ==========================================
+// CONTACTS
+// ==========================================
+
 export const CONTACTS = {
-  whatsapp: WHATSAPP_PHONE,
-  email: SUPPORT_EMAIL,
-  address: "ТЦ Вефа Блок ,офис Energymax Group / ул. Малдыбаева 25",
-  instagram: "@prozdorovie_kg",
-  telegram: "@nargizfullstack",
+    phone: seller.phone,
+    phoneHref: seller.phoneHref,
+
+    whatsapp: seller.whatsappPhone,
+
+    email: seller.email,
+
+    address: seller.legalAddress,
+
+    instagram: "@prozdorovie_kg",
+    telegram: "@nargizfullstack",
 } as const;
 
-// Настройки доставки
+// ==========================================
+// DELIVERY
+// ==========================================
+//
+// Подтверждённое текущее условие магазина:
+// доставка предоставляется в подарок.
+//
+// Не указываем жёсткие сроки вроде
+// "2–4 часа" или "до 24 часов",
+// поскольку фактический срок зависит от
+// города, региона и способа доставки.
+// ==========================================
+
 export const DELIVERY = {
-  freeFrom: FREE_DELIVERY_FROM_KGS,
-  currency: "сом",
-  bishkekTime: "2-4 часа",
-  regionsTime: "до 24 часов",
+    isGift: true,
+
+    label: "Доставка — в подарок",
+
+    description:
+        "Доставка заказов по Кыргызстану предоставляется в подарок. Способ и срок доставки подтверждает менеджер при оформлении заказа.",
+
+    bishkekTime:
+        "Срок доставки подтверждает менеджер",
+
+    regionsTime:
+        "Срок доставки подтверждает менеджер",
+
+    currency: seller.currency,
+    currencyCode: seller.currencyCode,
 } as const;

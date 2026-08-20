@@ -1,199 +1,366 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, User as UserIcon, Loader } from "lucide-react";
+import {
+    FormEvent,
+    KeyboardEvent,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import {
+    Bot,
+    LoaderCircle,
+    MessageCircle,
+    Send,
+    User as UserIcon,
+    X,
+} from "lucide-react";
+
+import { seller } from "@/config/seller";
 
 interface Message {
+    id: string;
     role: "user" | "assistant";
     content: string;
 }
 
+interface ApiResponse {
+    success?: boolean;
+    message?: string;
+    error?: string;
+}
+
+const MAX_MESSAGE_LENGTH = 1500;
+
+const initialMessage: Message = {
+    id: "welcome-message",
+    role: "assistant",
+    content:
+        "Здравствуйте! Я информационный AI-ассистент probiotic.kg. Помогу найти раздел сайта, объясню порядок оформления заказа и подскажу, где посмотреть информацию о товаре.",
+};
+
+function createMessageId() {
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
 export default function AiChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            role: "assistant",
-            content:
-                "Привет! Я AI-ассистент EnergyMax. Помогу выбрать пробиотик, расскажу о составе и применении. Чем могу помочь?",
-        },
-    ]);
+    const [messages, setMessages] = useState<Message[]>([initialMessage]);
     const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [messages, isSubmitting]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const focusTimer = window.setTimeout(() => {
+            inputRef.current?.focus();
+        }, 100);
+
+        return () => {
+            window.clearTimeout(focusTimer);
+        };
+    }, [isOpen]);
+
+    const addAssistantMessage = (content: string) => {
+        setMessages((currentMessages) => [
+            ...currentMessages,
+            {
+                id: createMessageId(),
+                role: "assistant",
+                content,
+            },
+        ]);
+    };
 
     const sendMessage = async () => {
-        if (!input.trim() || loading) return;
+        const trimmedInput = input.trim();
 
-        const userMessage: Message = { role: "user", content: input };
-        setMessages((prev) => [...prev, userMessage]);
+        if (!trimmedInput || isSubmitting) {
+            return;
+        }
+
+        const userMessage: Message = {
+            id: createMessageId(),
+            role: "user",
+            content: trimmedInput,
+        };
+
+        const requestMessages = [...messages, userMessage].map((message) => ({
+            role: message.role,
+            content: message.content,
+        }));
+
+        setMessages((currentMessages) => [
+            ...currentMessages,
+            userMessage,
+        ]);
         setInput("");
-        setLoading(true);
+        setIsSubmitting(true);
 
         try {
             const response = await fetch("/api/ai-chat", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
-                    messages: [...messages, userMessage],
+                    messages: requestMessages,
                 }),
             });
 
-            const data = await response.json();
+            const data = (await response.json().catch(() => null)) as
+                | ApiResponse
+                | null;
 
-            if (data.success) {
-                setMessages((prev) => [
-                    ...prev,
-                    { role: "assistant", content: data.message },
-                ]);
-            } else {
-                setMessages((prev) => [
-                    ...prev,
-                    {
-                        role: "assistant",
-                        content:
-                            data.error ||
-                            "Извините, произошла ошибка. Попробуйте позже или свяжитесь с нами в WhatsApp: +996990105555",
-                    },
-                ]);
+            if (
+                response.ok &&
+                data?.success === true &&
+                typeof data.message === "string" &&
+                data.message.trim()
+            ) {
+                addAssistantMessage(data.message.trim());
+                return;
             }
+
+            addAssistantMessage(
+                data?.error ||
+                `AI-ассистент временно недоступен. Свяжитесь с продавцом в WhatsApp: ${seller.phone}`,
+            );
         } catch (error) {
-            setMessages((prev) => [
-                ...prev,
-                {
-                    role: "assistant",
-                    content: "Ошибка связи с сервером. Попробуйте позже.",
-                },
-            ]);
+            console.error("Ошибка отправки сообщения в AI-чат:", error);
+
+            addAssistantMessage(
+                `Не удалось связаться с AI-ассистентом. Напишите продавцу в WhatsApp: ${seller.phone}`,
+            );
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        await sendMessage();
+    };
+
+    const handleKeyDown = (
+        event: KeyboardEvent<HTMLInputElement>,
+    ) => {
+        if (event.key === "Escape") {
+            setIsOpen(false);
         }
     };
 
     return (
         <>
-            {/* Кнопка открытия чата */}
             {!isOpen && (
                 <button
+                    type="button"
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-[#21AA57] text-white rounded-full shadow-lg hover:bg-[#1a8a46] transition flex items-center justify-center group"
+                    aria-label="Открыть AI-ассистента"
+                    aria-haspopup="dialog"
+                    className="fixed right-4 bottom-24 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#21AA57] text-white shadow-lg transition hover:bg-[#1a8a46] focus-visible:ring-4 focus-visible:ring-[#21AA57]/30 focus-visible:outline-none md:right-6 md:bottom-6 md:h-16 md:w-16"
                 >
-                    <MessageCircle className="w-7 h-7 group-hover:scale-110 transition" />
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-white" />
-                    </div>
+                    <MessageCircle
+                        className="h-7 w-7"
+                        aria-hidden="true"
+                    />
+
+                    <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#29380E]">
+                        <Bot
+                            className="h-3.5 w-3.5"
+                            aria-hidden="true"
+                        />
+                    </span>
                 </button>
             )}
 
-            {/* Окно чата */}
             {isOpen && (
-                <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-2xl flex flex-col">
+                <section
+                    role="dialog"
+                    aria-modal="false"
+                    aria-labelledby="ai-chat-title"
+                    className="fixed right-3 bottom-24 left-3 z-[70] flex max-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl md:right-6 md:bottom-6 md:left-auto md:h-[600px] md:w-96 md:max-h-[calc(100dvh-3rem)]"
+                >
                     {/* Шапка */}
-                    <div className="bg-gradient-to-r from-[#21AA57] to-[#1a8a46] text-white p-4 rounded-t-2xl flex items-center justify-between">
+                    <header className="flex items-center justify-between bg-gradient-to-r from-[#21AA57] to-[#1a8a46] p-4 text-white">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                                <Bot className="w-6 h-6" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                                <Bot
+                                    className="h-6 w-6"
+                                    aria-hidden="true"
+                                />
                             </div>
+
                             <div>
-                                <div className="font-semibold">AI-Ассистент</div>
-                                <div className="text-xs text-white/80">EnergyMax</div>
+                                <h2
+                                    id="ai-chat-title"
+                                    className="font-semibold"
+                                >
+                                    AI-ассистент
+                                </h2>
+
+                                <p className="text-xs text-white/80">
+                                    {seller.siteName}
+                                </p>
                             </div>
                         </div>
+
                         <button
+                            type="button"
                             onClick={() => setIsOpen(false)}
-                            className="p-2 hover:bg-white/20 rounded-lg transition"
+                            aria-label="Закрыть AI-ассистента"
+                            className="rounded-lg p-2 transition hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
                         >
-                            <X className="w-5 h-5" />
+                            <X
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                            />
                         </button>
-                    </div>
+                    </header>
 
                     {/* Сообщения */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {messages.map((message, index) => (
-                            <div
-                                key={index}
+                    <div
+                        aria-live="polite"
+                        aria-relevant="additions"
+                        className="flex-1 space-y-4 overflow-y-auto p-4"
+                    >
+                        {messages.map((message) => (
+                            <article
+                                key={message.id}
                                 className={`flex gap-3 ${
-                                    message.role === "user" ? "flex-row-reverse" : ""
+                                    message.role === "user"
+                                        ? "flex-row-reverse"
+                                        : ""
                                 }`}
                             >
                                 <div
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
                                         message.role === "user"
                                             ? "bg-[#29380E]"
                                             : "bg-[#21AA57]"
                                     }`}
                                 >
                                     {message.role === "user" ? (
-                                        <UserIcon className="w-4 h-4 text-white" />
+                                        <UserIcon
+                                            className="h-4 w-4 text-white"
+                                            aria-hidden="true"
+                                        />
                                     ) : (
-                                        <Bot className="w-4 h-4 text-white" />
+                                        <Bot
+                                            className="h-4 w-4 text-white"
+                                            aria-hidden="true"
+                                        />
                                     )}
                                 </div>
+
                                 <div
-                                    className={`flex-1 p-3 rounded-2xl ${
+                                    className={`max-w-[82%] rounded-2xl p-3 ${
                                         message.role === "user"
                                             ? "bg-[#29380E] text-white"
                                             : "bg-[#F4F7F5] text-[#29380E]"
                                     }`}
                                 >
-                                    <p className="text-sm whitespace-pre-wrap">
+                                    <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
                                         {message.content}
                                     </p>
                                 </div>
-                            </div>
+                            </article>
                         ))}
-                        {loading && (
-                            <div className="flex gap-3">
-                                <div className="w-8 h-8 bg-[#21AA57] rounded-full flex items-center justify-center">
-                                    <Loader className="w-4 h-4 text-white animate-spin" />
+
+                        {isSubmitting && (
+                            <div
+                                role="status"
+                                className="flex gap-3"
+                            >
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#21AA57]">
+                                    <LoaderCircle
+                                        className="h-4 w-4 animate-spin text-white"
+                                        aria-hidden="true"
+                                    />
                                 </div>
-                                <div className="bg-[#F4F7F5] p-3 rounded-2xl">
-                                    <p className="text-sm text-gray-600">Печатаю...</p>
+
+                                <div className="rounded-2xl bg-[#F4F7F5] p-3">
+                                    <p className="text-sm text-gray-600">
+                                        Формирую ответ…
+                                    </p>
                                 </div>
                             </div>
                         )}
+
                         <div ref={messagesEndRef} />
                     </div>
 
                     {/* Поле ввода */}
-                    <div className="border-t border-gray-200 p-4">
-                        <div className="flex gap-2">
+                    <footer className="border-t border-gray-200 p-4">
+                        <form
+                            onSubmit={handleSubmit}
+                            className="flex gap-2"
+                        >
+                            <label
+                                htmlFor="ai-chat-input"
+                                className="sr-only"
+                            >
+                                Сообщение AI-ассистенту
+                            </label>
+
                             <input
+                                ref={inputRef}
+                                id="ai-chat-input"
                                 type="text"
                                 value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                placeholder="Введите сообщение..."
-                                disabled={loading}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#21AA57] focus:border-transparent disabled:opacity-50"
+                                onChange={(event) =>
+                                    setInput(event.target.value)
+                                }
+                                onKeyDown={handleKeyDown}
+                                placeholder="Введите сообщение…"
+                                maxLength={MAX_MESSAGE_LENGTH}
+                                disabled={isSubmitting}
+                                autoComplete="off"
+                                className="min-w-0 flex-1 rounded-full border border-gray-300 px-4 py-2 text-sm outline-none transition placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:ring-[#21AA57] disabled:cursor-not-allowed disabled:opacity-50"
                             />
+
                             <button
-                                onClick={sendMessage}
-                                disabled={!input.trim() || loading}
-                                className="w-10 h-10 bg-[#21AA57] text-white rounded-full flex items-center justify-center hover:bg-[#1a8a46] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                type="submit"
+                                disabled={
+                                    !input.trim() || isSubmitting
+                                }
+                                aria-label="Отправить сообщение"
+                                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#21AA57] text-white transition hover:bg-[#1a8a46] focus-visible:ring-4 focus-visible:ring-[#21AA57]/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                                <Send className="w-5 h-5" />
+                                <Send
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                />
                             </button>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2 text-center">
-                            AI может допускать ошибки. Всегда консультируйтесь с врачом.
+                        </form>
+
+                        <p className="mt-3 text-center text-[10px] leading-relaxed text-gray-500">
+                            Не отправляйте паспортные данные, банковские
+                            реквизиты, диагнозы и медицинские документы.
+                            AI может ошибаться и не заменяет специалиста.
                         </p>
-                    </div>
-                </div>
+
+                        <a
+                            href={`https://wa.me/${seller.whatsappPhone}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 block text-center text-xs font-medium text-[#21AA57] hover:underline"
+                        >
+                            Связаться с продавцом: {seller.phone}
+                        </a>
+                    </footer>
+                </section>
             )}
         </>
     );

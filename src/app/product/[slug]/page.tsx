@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -21,10 +22,12 @@ import ReviewForm from "@/components/product/ReviewForm";
 import ReviewsList from "@/components/product/ReviewsList";
 
 import { seller } from "@/config/seller";
+
 import {
     products,
     type Product,
 } from "@/lib/content";
+
 import { prisma } from "@/lib/prisma";
 
 // ==========================================
@@ -38,15 +41,21 @@ type DbCommerceProduct = {
     inStock: boolean;
 };
 
-type HubConfig = {
-    href: string;
-    label: string;
-    title: string;
-    text: string;
-};
-
 // ==========================================
-// CONTENT HELPERS
+// CONTENT
+// ==========================================
+//
+// ВАЖНО:
+//
+// content.ts
+// = SEO / GEO / тексты / изображения /
+//   характеристики / FAQ / семантика.
+//
+// Neon
+// = id / цена / старая цена / наличие.
+//
+// Таким образом старый текст из БД больше
+// не переписывает SEO-контент страницы.
 // ==========================================
 
 function getContentProduct(
@@ -58,15 +67,16 @@ function getContentProduct(
     );
 }
 
-function getProductHref(
+// ==========================================
+// CANONICAL
+// ==========================================
+
+function getCanonicalPath(
     slug: string,
-): string {
+) {
     /*
-     * SuperProbiotic имеет отдельную
-     * сильную SEO-страницу.
-     *
-     * Не создаём две конкурирующие
-     * страницы для "Максилин Триллион".
+     * У Триллиона есть отдельный
+     * основной SEO URL.
      */
     if (
         slug ===
@@ -78,15 +88,13 @@ function getProductHref(
     return `/product/${slug}`;
 }
 
-function getCanonicalPath(
-    slug: string,
-): string {
-    return getProductHref(slug);
-}
+// ==========================================
+// KNOWLEDGE HUB
+// ==========================================
 
-function getHubConfig(
+function getKnowledgeHub(
     product: Product,
-): HubConfig | null {
+) {
     if (
         product.slug.startsWith(
             "maxilin-",
@@ -97,13 +105,10 @@ function getHubConfig(
                 "/maxilin",
 
             label:
-                "Максилин",
+                "Всё о Максилине",
 
-            title:
-                "Узнать больше о Максилине",
-
-            text:
-                "Сравните три формы Максилина, узнайте о Lactobacillus acidophilus 2585, микробиоте кишечника и отличиях форм.",
+            description:
+                "Три формы Максилина, Lactobacillus acidophilus 2585, отличия жидкой, сухой и немолочной формы.",
         };
     }
 
@@ -117,13 +122,10 @@ function getHubConfig(
                 "/l-arginine",
 
             label:
-                "L-Аргинин",
+                "Всё о L-Аргинине",
 
-            title:
-                "Узнать больше о L-Аргинине",
-
-            text:
-                "Что такое L-Arginine, чем аминокислота связана с синтезом оксида азота NO и какие варианты EnergyMax представлены.",
+            description:
+                "L-Arginine, аминокислота, оксид азота NO и варианты EnergyMax.",
         };
     }
 
@@ -131,64 +133,40 @@ function getHubConfig(
 }
 
 // ==========================================
-// SAFE DATABASE QUERY
+// DATABASE
 // ==========================================
 //
-// ВАЖНО:
+// НЕ используем:
+// prisma.product.findUnique({ where: { slug } })
 //
-// Не делаем:
+// потому что тогда Prisma получает все поля.
 //
-// prisma.product.findUnique({
-//     where: { slug },
-// });
-//
-// Потому что Prisma тогда пытается выбрать
-// ВСЕ поля модели.
-//
-// Пока схема Neon и расширенная Prisma-модель
-// синхронизируются поэтапно, это может
-// приводить к runtime 500.
-//
-// Здесь из Neon берём только динамические
-// коммерческие данные:
-// - id
-// - цена
-// - старая цена
-// - наличие
-//
-// Большой SEO-контент берём из content.ts.
+// Нам здесь нужны только динамические
+// коммерческие данные.
 // ==========================================
 
 async function getDbCommerceProduct(
     slug: string,
 ): Promise<DbCommerceProduct | null> {
     try {
-        const product =
-            await prisma.product.findUnique({
-                where: {
-                    slug,
-                },
+        return await prisma.product.findUnique({
+            where: {
+                slug,
+            },
 
-                select: {
-                    id: true,
-                    priceKgs: true,
-                    oldPriceKgs: true,
-                    inStock: true,
-                },
-            });
-
-        return product;
+            select: {
+                id: true,
+                priceKgs: true,
+                oldPriceKgs: true,
+                inStock: true,
+            },
+        });
     } catch (error) {
         console.error(
-            `[product] Failed to load commerce data for ${slug}`,
+            `[product] Commerce data error: ${slug}`,
             error,
         );
 
-        /*
-         * SEO-страница продолжает работать
-         * из content.ts даже при временной
-         * проблеме с БД.
-         */
         return null;
     }
 }
@@ -229,9 +207,21 @@ export async function generateMetadata({
             product.slug,
         );
 
-    const image =
+    const firstImage =
         product.images[0];
 
+    /*
+     * absolute очень важно.
+     *
+     * RootLayout уже содержит:
+     *
+     * %s | probiotic.kg
+     *
+     * Если использовать обычный title,
+     * можем снова получить:
+     *
+     * | probiotic.kg | probiotic.kg
+     */
     const title =
         product.seoTitle ??
         `${product.name} купить в Кыргызстане | probiotic.kg`;
@@ -285,23 +275,23 @@ export async function generateMetadata({
             siteName:
             seller.siteName,
 
+            url:
+            canonicalPath,
+
             title:
             product.name,
 
             description,
 
-            url:
-            canonicalPath,
-
             images:
-                image
+                firstImage
                     ? [
                         {
                             url:
-                            image.src,
+                            firstImage.src,
 
                             alt:
-                            image.alt,
+                            firstImage.alt,
                         },
                     ]
                     : [],
@@ -317,9 +307,9 @@ export async function generateMetadata({
             description,
 
             images:
-                image
+                firstImage
                     ? [
-                        image.src,
+                        firstImage.src,
                     ]
                     : [],
         },
@@ -327,15 +317,15 @@ export async function generateMetadata({
 }
 
 // ==========================================
-// PRODUCT STRUCTURED DATA
+// STRUCTURED DATA
 // ==========================================
 
 function ProductStructuredData({
                                    product,
-                                   dbProduct,
+                                   commerce,
                                }: {
     product: Product;
-    dbProduct: DbCommerceProduct | null;
+    commerce: DbCommerceProduct | null;
 }) {
     const baseUrl =
         seller.siteUrl.replace(
@@ -352,23 +342,23 @@ function ProductStructuredData({
         `${baseUrl}${canonicalPath}`;
 
     const price =
-        dbProduct?.priceKgs ??
+        commerce?.priceKgs ??
         product.priceKgs;
 
     const inStock =
-        dbProduct
-            ? dbProduct.inStock
+        commerce
+            ? commerce.inStock
             : product.availability ===
             "in_stock";
 
-    const additionalProperty: Array<{
+    const properties: Array<{
         "@type": "PropertyValue";
         name: string;
         value: string;
     }> = [];
 
     if (product.form) {
-        additionalProperty.push({
+        properties.push({
             "@type":
                 "PropertyValue",
 
@@ -381,7 +371,7 @@ function ProductStructuredData({
     }
 
     if (product.packInfo) {
-        additionalProperty.push({
+        properties.push({
             "@type":
                 "PropertyValue",
 
@@ -393,13 +383,6 @@ function ProductStructuredData({
         });
     }
 
-    /*
-     * Для Product schema берём только
-     * характеристики, которые реально
-     * присутствуют на странице.
-     *
-     * Никакого keyword stuffing.
-     */
     product.features
         ?.slice(0, 6)
         .forEach(
@@ -407,7 +390,7 @@ function ProductStructuredData({
                 feature,
                 index,
             ) => {
-                additionalProperty.push({
+                properties.push({
                     "@type":
                         "PropertyValue",
 
@@ -438,6 +421,12 @@ function ProductStructuredData({
         url:
         productUrl,
 
+        description:
+        product.description,
+
+        sku:
+        product.slug,
+
         image:
             product.images.map(
                 (image) =>
@@ -448,11 +437,13 @@ function ProductStructuredData({
                         : `${baseUrl}${image.src}`,
             ),
 
-        description:
-        product.description,
+        brand: {
+            "@type":
+                "Brand",
 
-        sku:
-        product.slug,
+            name:
+                "EnergyMax",
+        },
 
         category:
             product.category ===
@@ -463,22 +454,12 @@ function ProductStructuredData({
                     ? "Аминокислоты и функциональное питание"
                     : "Локальные формы",
 
-        brand: {
-            "@type":
-                "Brand",
-
-            name:
-                "EnergyMax",
-        },
-
-        additionalProperty,
+        additionalProperty:
+        properties,
 
         offers: {
             "@type":
                 "Offer",
-
-            "@id":
-                `${productUrl}#offer`,
 
             url:
             productUrl,
@@ -509,17 +490,14 @@ function ProductStructuredData({
 
                 url:
                 baseUrl,
-
-                telephone:
-                seller.phone,
             },
         },
     };
 
     const hub =
-        getHubConfig(product);
+        getKnowledgeHub(product);
 
-    const breadcrumbItems = [
+    const breadcrumbs = [
         {
             "@type":
                 "ListItem",
@@ -536,7 +514,7 @@ function ProductStructuredData({
     ];
 
     if (hub) {
-        breadcrumbItems.push({
+        breadcrumbs.push({
             "@type":
                 "ListItem",
 
@@ -544,19 +522,23 @@ function ProductStructuredData({
                 2,
 
             name:
-            hub.label,
+                product.slug.startsWith(
+                    "maxilin-",
+                )
+                    ? "Максилин"
+                    : "L-Аргинин",
 
             item:
                 `${baseUrl}${hub.href}`,
         });
     }
 
-    breadcrumbItems.push({
+    breadcrumbs.push({
         "@type":
             "ListItem",
 
         position:
-            breadcrumbItems.length +
+            breadcrumbs.length +
             1,
 
         name:
@@ -574,7 +556,7 @@ function ProductStructuredData({
             "BreadcrumbList",
 
         itemListElement:
-        breadcrumbItems,
+        breadcrumbs,
     };
 
     return (
@@ -622,9 +604,9 @@ export default async function ProductPage({
     const { slug } =
         await params;
 
-    // --------------------------------------
-    // VERIFIED CONTENT
-    // --------------------------------------
+    // ======================================
+    // VERIFIED SEO CONTENT
+    // ======================================
 
     const contentProduct =
         getContentProduct(slug);
@@ -633,40 +615,53 @@ export default async function ProductPage({
         notFound();
     }
 
-    // --------------------------------------
-    // DYNAMIC COMMERCE DATA
-    // --------------------------------------
+    // ======================================
+    // COMMERCE DATA
+    // ======================================
 
-    const dbProduct =
+    const commerce =
         await getDbCommerceProduct(
             slug,
         );
 
     const price =
-        dbProduct?.priceKgs ??
+        commerce?.priceKgs ??
         contentProduct.priceKgs;
 
-    const oldPrice =
-        dbProduct?.oldPriceKgs ??
-        contentProduct.oldPriceKgs;
-
+    /*
+     * Если товар существует в БД —
+     * наличие из БД имеет приоритет.
+     */
     const inStock =
-        dbProduct
-            ? dbProduct.inStock
+        commerce
+            ? commerce.inStock
             : contentProduct.availability ===
             "in_stock";
 
     /*
-     * UI получает:
+     * oldPrice из БД используем только
+     * если товар реально существует в БД.
+     */
+    const oldPrice =
+        commerce
+            ? commerce.oldPriceKgs ??
+            undefined
+            : contentProduct.oldPriceKgs;
+
+    /*
+     * Объект для существующих UI-компонентов.
      *
-     * rich content -> content.ts
-     * price/stock/id -> Neon
+     * SEO-контент:
+     * content.ts
+     *
+     * Коммерция:
+     * Neon
      */
     const product = {
         ...contentProduct,
 
         id:
-            dbProduct?.id ??
+            commerce?.id ??
             contentProduct.slug,
 
         priceKgs:
@@ -684,7 +679,7 @@ export default async function ProductPage({
     };
 
     const hub =
-        getHubConfig(
+        getKnowledgeHub(
             contentProduct,
         );
 
@@ -700,11 +695,9 @@ export default async function ProductPage({
             )
             .filter(
                 (
-                    related,
-                ): related is Product =>
-                    Boolean(
-                        related,
-                    ),
+                    item,
+                ): item is Product =>
+                    Boolean(item),
             )
             .slice(0, 4);
 
@@ -718,22 +711,18 @@ export default async function ProductPage({
 
     return (
         <>
-            {/* ==================================
-                GOOGLE / YANDEX / BING / AI
-            ================================== */}
-
             <ProductStructuredData
                 product={
                     contentProduct
                 }
-                dbProduct={
-                    dbProduct
+                commerce={
+                    commerce
                 }
             />
 
             <main className="min-h-screen bg-white pb-24">
                 {/* ==================================
-                    BREADCRUMBS / BACK
+                    TOP NAV
                 ================================== */}
 
                 <div className="sticky top-0 z-30 border-b border-gray-100 bg-white/90 px-4 py-4 backdrop-blur-md md:px-12">
@@ -747,7 +736,7 @@ export default async function ProductPage({
                                 aria-hidden="true"
                             />
 
-                            Каталог
+                            Назад в каталог
                         </Link>
 
                         {hub && (
@@ -755,14 +744,14 @@ export default async function ProductPage({
                                 href={
                                     hub.href
                                 }
-                                className="flex items-center gap-2 text-xs font-black text-[#21AA57]"
+                                className="inline-flex items-center gap-2 text-xs font-black text-[#21AA57]"
                             >
                                 {
                                     hub.label
                                 }
 
                                 <ArrowRight
-                                    className="h-3.5 w-3.5"
+                                    className="h-4 w-4"
                                     aria-hidden="true"
                                 />
                             </Link>
@@ -870,51 +859,44 @@ export default async function ProductPage({
 
                             {/* BENEFITS */}
 
-                            {contentProduct
-                                    .shortBenefits
-                                    .length >
-                                0 && (
-                                    <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
-                                        {contentProduct.shortBenefits.map(
-                                            (
-                                                benefit,
-                                            ) => (
-                                                <div
-                                                    key={
-                                                        benefit
-                                                    }
-                                                    className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#F4F7F5] p-4"
-                                                >
-                                                    <Zap
-                                                        className="h-5 w-5 flex-shrink-0 text-[#21AA57]"
-                                                        aria-hidden="true"
-                                                    />
+                            <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
+                                {contentProduct.shortBenefits.map(
+                                    (
+                                        benefit,
+                                    ) => (
+                                        <div
+                                            key={
+                                                benefit
+                                            }
+                                            className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#F4F7F5] p-4"
+                                        >
+                                            <Zap
+                                                className="h-5 w-5 flex-shrink-0 text-[#21AA57]"
+                                                aria-hidden="true"
+                                            />
 
-                                                    <span className="text-sm font-bold text-[#29380E]">
-                                                    {
-                                                        benefit
-                                                    }
-                                                </span>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
+                                            <span className="text-sm font-bold text-[#29380E]">
+                                                {
+                                                    benefit
+                                                }
+                                            </span>
+                                        </div>
+                                    ),
                                 )}
+                            </div>
 
                             {/* DESCRIPTION */}
 
-                            <p className="mt-8 text-sm leading-7 text-[#29380E]/60 md:text-base">
+                            <p className="mt-8 text-sm leading-7 text-[#29380E]/65 md:text-base">
                                 {
                                     contentProduct.description
                                 }
                             </p>
 
-                            {/* ==================================
-                                CART / WHATSAPP
-                            ================================== */}
+                            {/* CART */}
 
                             <div className="mt-8">
-                                {dbProduct ? (
+                                {commerce ? (
                                     <AddToCartSection
                                         product={
                                             product as never
@@ -923,15 +905,13 @@ export default async function ProductPage({
                                 ) : (
                                     <div className="rounded-[2rem] border border-[#21AA57]/15 bg-[#F4F7F5] p-6">
                                         <p className="font-black text-[#29380E]">
-                                            Оформить
-                                            заказ
+                                            Заказать
+                                            товар
                                         </p>
 
                                         <p className="mt-2 text-sm leading-6 text-[#29380E]/55">
                                             Наличие
-                                            и оформление
-                                            заказа можно
-                                            быстро
+                                            можно
                                             подтвердить
                                             через
                                             WhatsApp.
@@ -951,103 +931,132 @@ export default async function ProductPage({
                                             />
 
                                             Заказать
-                                            в WhatsApp
                                         </a>
                                     </div>
                                 )}
                             </div>
 
-                            {/* ==================================
-                                DELIVERY / DOCUMENTS
-                            ================================== */}
+                            {/* DELIVERY */}
 
                             <div className="mt-10 space-y-5 border-t border-gray-100 pt-8">
-                                <InfoRow
-                                    icon={
-                                        Truck
-                                    }
-                                    title="Доставка"
-                                >
-                                    <p>
-                                        По
-                                        Кыргызстану
-                                        доставка
-                                        предоставляется
-                                        в подарок.
-                                        Возможность
-                                        отправки
-                                        в Казахстан
-                                        и другие
-                                        страны СНГ
-                                        уточняется
-                                        по стране
-                                        и городу.
-                                    </p>
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#21AA57]/10">
+                                        <Truck
+                                            className="h-5 w-5 text-[#21AA57]"
+                                            aria-hidden="true"
+                                        />
+                                    </div>
 
-                                    <Link
-                                        href="/delivery"
-                                        className="mt-1 inline-block font-semibold text-[#21AA57] hover:underline"
-                                    >
-                                        Условия
-                                        доставки
-                                    </Link>
-                                </InfoRow>
+                                    <div>
+                                        <h2 className="mb-1 text-sm font-bold text-[#29380E]">
+                                            Доставка
+                                            — в
+                                            подарок
+                                        </h2>
 
-                                <InfoRow
-                                    icon={
-                                        FileText
-                                    }
-                                    title="Документы"
-                                >
-                                    <p>
-                                        Документы
-                                        необходимо
-                                        сверять
-                                        с точным
-                                        названием
-                                        и формой
-                                        конкретного
-                                        товара.
-                                    </p>
+                                        <p className="text-sm leading-relaxed text-gray-500">
+                                            Доставка
+                                            по
+                                            Кыргызстану
+                                            предоставляется
+                                            в подарок.
+                                            Возможность
+                                            отправки
+                                            в Казахстан
+                                            и другие
+                                            страны
+                                            СНГ
+                                            уточняется
+                                            при
+                                            оформлении.
+                                        </p>
 
-                                    <Link
-                                        href="/docs"
-                                        className="mt-1 inline-block font-semibold text-[#21AA57] hover:underline"
-                                    >
-                                        Открыть
-                                        документы
-                                    </Link>
-                                </InfoRow>
+                                        <Link
+                                            href="/delivery"
+                                            className="mt-1 inline-block text-sm font-semibold text-[#21AA57] hover:underline"
+                                        >
+                                            Условия
+                                            доставки
+                                        </Link>
+                                    </div>
+                                </div>
 
-                                <InfoRow
-                                    icon={
-                                        CheckCircle2
-                                    }
-                                    title="Проверка при получении"
-                                >
-                                    <p>
-                                        Проверьте
-                                        название,
-                                        количество,
-                                        срок
-                                        годности
-                                        и целостность
-                                        упаковки
-                                        до
-                                        использования.
-                                    </p>
-                                </InfoRow>
+                                {/* DOCUMENTS */}
+
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#21AA57]/10">
+                                        <FileText
+                                            className="h-5 w-5 text-[#21AA57]"
+                                            aria-hidden="true"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <h2 className="mb-1 text-sm font-bold text-[#29380E]">
+                                            Документы
+                                        </h2>
+
+                                        <p className="text-sm leading-relaxed text-gray-500">
+                                            Документы
+                                            необходимо
+                                            сопоставлять
+                                            с точным
+                                            названием
+                                            и формой
+                                            конкретного
+                                            товара.
+                                        </p>
+
+                                        <Link
+                                            href="/docs"
+                                            className="mt-1 inline-block text-sm font-semibold text-[#21AA57] hover:underline"
+                                        >
+                                            Открыть
+                                            документы
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                {/* CHECK */}
+
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F4F7F5]">
+                                        <CheckCircle2
+                                            className="h-5 w-5 text-[#21AA57]"
+                                            aria-hidden="true"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <h2 className="mb-1 text-sm font-bold text-[#29380E]">
+                                            Проверка
+                                            при
+                                            получении
+                                        </h2>
+
+                                        <p className="text-sm leading-relaxed text-gray-500">
+                                            Проверьте
+                                            название,
+                                            количество,
+                                            срок
+                                            годности
+                                            и
+                                            целостность
+                                            упаковки.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* ==================================
-                        KNOWLEDGE HUB LINK
+                        KNOWLEDGE HUB
                     ================================== */}
 
                     {hub && (
-                        <section className="mt-20 overflow-hidden rounded-[2.5rem] bg-[#29380E] p-7 text-white md:p-10">
-                            <div className="grid gap-7 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+                        <section className="mt-20 rounded-[2.5rem] bg-[#29380E] p-7 text-white md:p-10">
+                            <div className="grid gap-6 md:grid-cols-[auto_1fr_auto] md:items-center">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#21AA57]">
                                     <BookOpen
                                         className="h-6 w-6"
@@ -1056,20 +1065,20 @@ export default async function ProductPage({
                                 </div>
 
                                 <div>
-                                    <p className="text-[10px] font-black tracking-[0.2em] text-[#21AA57] uppercase">
+                                    <p className="text-xs font-black tracking-[0.18em] text-[#21AA57] uppercase">
                                         Полезная
                                         информация
                                     </p>
 
                                     <h2 className="mt-2 text-2xl font-black">
                                         {
-                                            hub.title
+                                            hub.label
                                         }
                                     </h2>
 
-                                    <p className="mt-3 max-w-3xl text-sm leading-7 text-white/60">
+                                    <p className="mt-2 max-w-3xl text-sm leading-7 text-white/60">
                                         {
-                                            hub.text
+                                            hub.description
                                         }
                                     </p>
                                 </div>
@@ -1078,9 +1087,9 @@ export default async function ProductPage({
                                     href={
                                         hub.href
                                     }
-                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-black text-[#29380E]"
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-black text-[#29380E]"
                                 >
-                                    Подробнее
+                                    Читать
 
                                     <ArrowRight
                                         className="h-4 w-4"
@@ -1092,7 +1101,7 @@ export default async function ProductPage({
                     )}
 
                     {/* ==================================
-                        DESCRIPTION / COMPOSITION
+                        PRODUCT CONTENT
                     ================================== */}
 
                     <div className="mt-20">
@@ -1104,80 +1113,90 @@ export default async function ProductPage({
                     </div>
 
                     {/* ==================================
-                        RELATED PRODUCTS
+                        RELATED
                     ================================== */}
 
                     {relatedProducts.length >
                         0 && (
                             <section className="mt-20">
                                 <p className="text-xs font-black tracking-[0.18em] text-[#21AA57] uppercase">
-                                    Смотрите также
+                                    Смотрите
+                                    также
                                 </p>
 
                                 <h2 className="mt-2 text-3xl font-black tracking-tight text-[#29380E] uppercase">
-                                    Связанные
-                                    товары
+                                    Другие
+                                    формы
+                                    и товары
                                 </h2>
 
-                                <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                                     {relatedProducts.map(
                                         (
                                             related,
-                                        ) => (
-                                            <Link
-                                                key={
-                                                    related.slug
-                                                }
-                                                href={getProductHref(
-                                                    related.slug,
-                                                )}
-                                                className="group rounded-[2rem] border border-gray-100 bg-[#F4F7F5] p-6 transition hover:-translate-y-1 hover:shadow-lg"
-                                            >
-                                                <p className="text-[10px] font-black tracking-[0.18em] text-[#21AA57] uppercase">
-                                                    EnergyMax
-                                                </p>
+                                        ) => {
+                                            const href =
+                                                related.slug ===
+                                                "maxilin-superprobiotic-50"
+                                                    ? "/maxilin/superprobiotic"
+                                                    : `/product/${related.slug}`;
 
-                                                <h3 className="mt-3 text-lg font-black text-[#29380E]">
-                                                    {
-                                                        related.name
+                                            return (
+                                                <Link
+                                                    key={
+                                                        related.slug
                                                     }
-                                                </h3>
-
-                                                {related.packInfo && (
-                                                    <p className="mt-2 text-xs leading-5 text-[#29380E]/45">
-                                                        {
-                                                            related.packInfo
-                                                        }
+                                                    href={
+                                                        href
+                                                    }
+                                                    className="group rounded-[2rem] border border-gray-100 bg-[#F4F7F5] p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                                                >
+                                                    <p className="text-[10px] font-black tracking-[0.18em] text-[#21AA57] uppercase">
+                                                        EnergyMax
                                                     </p>
-                                                )}
 
-                                                <p className="mt-5 text-lg font-black text-[#21AA57]">
-                                                    {related.priceKgs.toLocaleString(
-                                                        "ru-RU",
-                                                    )}{" "}
-                                                    сом
-                                                </p>
+                                                    <h3 className="mt-3 font-black text-[#29380E]">
+                                                        {
+                                                            related.name
+                                                        }
+                                                    </h3>
 
-                                                <span className="mt-5 inline-flex items-center gap-2 text-xs font-black text-[#29380E]">
-                                                Подробнее
+                                                    {related.packInfo && (
+                                                        <p className="mt-2 text-xs leading-5 text-[#29380E]/45">
+                                                            {
+                                                                related.packInfo
+                                                            }
+                                                        </p>
+                                                    )}
 
-                                                <ArrowRight
-                                                    className="h-3.5 w-3.5 text-[#21AA57] transition-transform group-hover:translate-x-1"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                            </Link>
-                                        ),
+                                                    <p className="mt-5 font-black text-[#21AA57]">
+                                                        {related.priceKgs.toLocaleString(
+                                                            "ru-RU",
+                                                        )}{" "}
+                                                        сом
+                                                    </p>
+
+                                                    <span className="mt-4 inline-flex items-center gap-2 text-xs font-black text-[#29380E]">
+                                                    Подробнее
+
+                                                    <ArrowRight
+                                                        className="h-3.5 w-3.5 text-[#21AA57] transition-transform group-hover:translate-x-1"
+                                                        aria-hidden="true"
+                                                    />
+                                                </span>
+                                                </Link>
+                                            );
+                                        },
                                     )}
                                 </div>
                             </section>
                         )}
 
                     {/* ==================================
-                        REVIEWS
+                        REAL DATABASE REVIEWS
                     ================================== */}
 
-                    {dbProduct && (
+                    {commerce && (
                         <section className="mt-20">
                             <h2 className="text-3xl font-bold tracking-tight text-[#29380E] uppercase">
                                 Отзывы
@@ -1193,22 +1212,20 @@ export default async function ProductPage({
                                 и не
                                 гарантируют
                                 одинаковый
-                                результат
-                                у разных
-                                людей.
+                                результат.
                             </p>
 
                             <div className="mt-8 grid gap-8 lg:grid-cols-2">
                                 <ReviewsList
                                     productId={
-                                        dbProduct.id
+                                        commerce.id
                                     }
                                 />
 
                                 <div className="h-fit lg:sticky lg:top-32">
                                     <ReviewForm
                                         productId={
-                                            dbProduct.id
+                                            commerce.id
                                         }
                                     />
                                 </div>
@@ -1218,40 +1235,5 @@ export default async function ProductPage({
                 </div>
             </main>
         </>
-    );
-}
-
-// ==========================================
-// INFO ROW
-// ==========================================
-
-function InfoRow({
-                     icon: Icon,
-                     title,
-                     children,
-                 }: {
-    icon: typeof Truck;
-    title: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F4F7F5]">
-                <Icon
-                    className="h-5 w-5 text-[#21AA57]"
-                    aria-hidden="true"
-                />
-            </div>
-
-            <div>
-                <h2 className="mb-1 text-sm font-bold text-[#29380E]">
-                    {title}
-                </h2>
-
-                <div className="text-sm leading-relaxed text-gray-500">
-                    {children}
-                </div>
-            </div>
-        </div>
     );
 }

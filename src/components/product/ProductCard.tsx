@@ -21,7 +21,7 @@ export default function ProductCard({ product }: { product: any }) {
             {/* Изображение */}
             <div className="relative h-64 w-full mb-4 rounded-[2rem] bg-[#F4F7F5] overflow-hidden flex items-center justify-center p-6">
                 <Image
-                    src={images[0]?.src || '/images/placeholder.png'}
+                    src={images[1]?.src || '/images/placeholder.png'}
                     alt={product.name}
                     fill
                     className="object-contain transition-transform duration-700 group-hover:scale-110"

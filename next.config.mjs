@@ -1,5 +1,20 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+
+    async redirects() {
+        return [
+            {
+                source:
+                    "/product/maxilin-superprobiotic-50",
+
+                destination:
+                    "/maxilin/superprobiotic",
+
+                permanent:
+                    true,
+            },
+        ];
+    },
     output: "standalone",
 
     /**

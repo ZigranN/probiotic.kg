@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 import "./globals.css";
 
@@ -25,6 +26,19 @@ export const metadata: Metadata = {
         seller.siteUrl,
     ),
 
+    // --------------------------------------
+    // SEARCH ENGINE VERIFICATION
+    // --------------------------------------
+
+    verification: {
+        yandex:
+            "47520d13adadf532",
+    },
+
+    // --------------------------------------
+    // TITLE
+    // --------------------------------------
+
     title: {
         default:
             "Максилин в Кыргызстане — probiotic.kg",
@@ -32,6 +46,10 @@ export const metadata: Metadata = {
         template:
             "%s | probiotic.kg",
     },
+
+    // --------------------------------------
+    // DESCRIPTION
+    // --------------------------------------
 
     description:
         "Максилин и продукция EnergyMax в Кыргызстане. Жидкий Максилин, сухой Максилин и Максилин Триллион. Информация о пробиотиках, штамме Lactobacillus acidophilus 2585, кишечнике, микробиоте, документах, заказе и доставке.",
@@ -61,10 +79,18 @@ export const metadata: Metadata = {
     referrer:
         "origin-when-cross-origin",
 
+    // --------------------------------------
+    // CANONICAL
+    // --------------------------------------
+
     alternates: {
         canonical:
             "/",
     },
+
+    // --------------------------------------
+    // OPEN GRAPH
+    // --------------------------------------
 
     openGraph: {
         type:
@@ -96,6 +122,10 @@ export const metadata: Metadata = {
         ],
     },
 
+    // --------------------------------------
+    // TWITTER / SOCIAL PREVIEW
+    // --------------------------------------
+
     twitter: {
         card:
             "summary_large_image",
@@ -110,6 +140,10 @@ export const metadata: Metadata = {
             "/images/logo-main.webp",
         ],
     },
+
+    // --------------------------------------
+    // ROBOTS
+    // --------------------------------------
 
     robots: {
         index:
@@ -136,6 +170,10 @@ export const metadata: Metadata = {
         },
     },
 
+    // --------------------------------------
+    // FORMAT DETECTION
+    // --------------------------------------
+
     formatDetection: {
         telephone:
             false,
@@ -152,18 +190,19 @@ export const metadata: Metadata = {
 // SITE STRUCTURED DATA
 // ==========================================
 //
-// Помогает поисковым и AI-системам
-// понять:
+// Схема описывает:
 //
 // probiotic.kg
+//     ↓
+// ИП Мамытова Н.Т.
 //     ↓
 // интернет-магазин в Кыргызстане
 //     ↓
 // Максилин / EnergyMax
 //     ↓
-// пробиотики / микробиота / кишечник
+// доставка по Кыргызстану
 //
-// Не используем здесь медицинские обещания.
+// Без медицинских обещаний.
 // ==========================================
 
 function SiteStructuredData() {
@@ -173,20 +212,22 @@ function SiteStructuredData() {
             "",
         );
 
+    const instagramHandle =
+        siteConfig.instagram
+            .replace(/^@/, "")
+            .trim();
+
     const instagramUrl =
-        `https://www.instagram.com/${siteConfig.instagram.replace(
-            "@",
-            "",
-        )}/`;
+        `https://www.instagram.com/${instagramHandle}/`;
 
     const graph = {
         "@context":
             "https://schema.org",
 
         "@graph": [
-            // ----------------------------------
+            // ==================================
             // ORGANIZATION
-            // ----------------------------------
+            // ==================================
 
             {
                 "@type":
@@ -198,11 +239,19 @@ function SiteStructuredData() {
                 name:
                 seller.legalName,
 
-                alternateName:
-                seller.siteName,
+                alternateName: [
+                    seller.siteName,
+                    "probiotic.kg",
+                    "Максилин Кыргызстан",
+                    "EnergyMax Кыргызстан",
+                ],
 
                 url:
                 baseUrl,
+
+                // ------------------------------
+                // LOGO
+                // ------------------------------
 
                 logo: {
                     "@type":
@@ -226,8 +275,16 @@ function SiteStructuredData() {
                         `${baseUrl}/#logo`,
                 },
 
+                // ------------------------------
+                // DESCRIPTION
+                // ------------------------------
+
                 description:
                     "Интернет-магазин продукции EnergyMax и Максилин в Кыргызской Республике.",
+
+                // ------------------------------
+                // CONTACTS
+                // ------------------------------
 
                 email:
                 seller.email,
@@ -267,8 +324,8 @@ function SiteStructuredData() {
                             "KG",
 
                         availableLanguage: [
-                            "Russian",
-                            "Kyrgyz",
+                            "ru",
+                            "ky",
                         ],
                     },
 
@@ -288,10 +345,14 @@ function SiteStructuredData() {
                         ],
 
                         availableLanguage: [
-                            "Russian",
+                            "ru",
                         ],
                     },
                 ],
+
+                // ------------------------------
+                // AREA SERVED
+                // ------------------------------
 
                 areaServed: {
                     "@type":
@@ -301,26 +362,91 @@ function SiteStructuredData() {
                         "Кыргызстан",
                 },
 
+                // ------------------------------
+                // SHIPPING POLICY
+                // ------------------------------
+                //
+                // Подтверждаем только то,
+                // что точно известно:
+                //
+                // Кыргызстан → 0 KGS.
+                //
+                // Казахстан и СНГ здесь
+                // специально не размечаем,
+                // поскольку стоимость и сроки
+                // уточняются при оформлении.
+                // ------------------------------
+
+                hasShippingService: {
+                    "@type":
+                        "ShippingService",
+
+                    "@id":
+                        `${baseUrl}/delivery#shipping-service-kg`,
+
+                    name:
+                        "Доставка по Кыргызстану",
+
+                    description:
+                        "Доставка заказов по Кыргызской Республике предоставляется в подарок.",
+
+                    shippingConditions: {
+                        "@type":
+                            "ShippingConditions",
+
+                        shippingDestination: {
+                            "@type":
+                                "DefinedRegion",
+
+                            addressCountry:
+                                "KG",
+                        },
+
+                        shippingRate: {
+                            "@type":
+                                "MonetaryAmount",
+
+                            value:
+                                0,
+
+                            currency:
+                                "KGS",
+                        },
+                    },
+                },
+
+                // ------------------------------
+                // SOCIAL
+                // ------------------------------
+
                 sameAs: [
                     instagramUrl,
                 ],
 
+                // ------------------------------
+                // ENTITY / TOPICAL SEMANTICS
+                // ------------------------------
+
                 knowsAbout: [
                     "Максилин",
                     "Maxilin",
+                    "Максилин жидкий",
+                    "Жидкий Максилин",
+                    "Максилин сухой",
+                    "Сухой Максилин",
                     "Maxilin SuperProbiotic",
                     "Максилин Триллион",
+                    "Lactobacillus acidophilus 2585",
                     "EnergyMax",
                     "пробиотики",
-                    "Lactobacillus acidophilus 2585",
                     "микробиота кишечника",
                     "микробиом кишечника",
                 ],
             },
 
-            // ----------------------------------
+            // ==================================
             // WEBSITE
-            // ----------------------------------
+            // ==================================
 
             {
                 "@type":
@@ -348,8 +474,10 @@ function SiteStructuredData() {
                         `${baseUrl}/#organization`,
                 },
 
-                inLanguage:
+                inLanguage: [
                     "ru-KG",
+                    "ky-KG",
+                ],
             },
         ],
     };
@@ -377,20 +505,20 @@ function SiteStructuredData() {
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
-    children: React.ReactNode;
+    children: ReactNode;
 }>) {
     return (
         <html lang="ru">
         <body>
-        {/* SEO / GEO / Entity data */}
+        {/* SEO / GEO / ENTITY DATA */}
 
         <SiteStructuredData />
 
-        {/* Analytics */}
+        {/* ANALYTICS */}
 
         <Analytics />
 
-        {/* Application */}
+        {/* APPLICATION */}
 
         <Providers>
             <Header />

@@ -561,12 +561,12 @@ export const products: Product[] = [
         ],
         imageBg: "from-[#21AA57]/20 via-[#DFF7E8]/30 to-transparent",
         availability: "in_stock",
-        priceKgs: 7800,
+        priceKgs: 7500,
         variants: [
             {
                 id: "superprobiotic-50",
                 title: "Упаковка 50 саше",
-                priceKgs: 7800,
+                priceKgs: 7500,
                 badge: "Доставка в подарок",
             },
         ],
